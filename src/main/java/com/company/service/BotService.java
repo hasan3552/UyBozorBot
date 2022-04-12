@@ -62,6 +62,7 @@ public class BotService extends Thread{
                     "\n\n<b>MASALAN: FAYZULLAYEV HASAN</b>" :
                     "Пожалуйста, введите свое полное имя.\n\n<b> НАПРИМЕР: ФАЙЗУЛЛАЕВ ХАСАН </b>");
             sendMessage.setParseMode(ParseMode.HTML);
+            sendMessage.setReplyMarkup(new ReplyKeyboardRemove(true));
 
             Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
 
