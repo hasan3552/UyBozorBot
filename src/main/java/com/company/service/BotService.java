@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
@@ -63,6 +64,11 @@ public class BotService extends Thread{
             sendMessage.setParseMode(ParseMode.HTML);
 
             Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
+
+            DeleteMessage deleteMessage = new DeleteMessage();
+            deleteMessage.setChatId(String.valueOf(message.getChatId()));
+            deleteMessage.setMessageId(message.getMessageId());
+            Main.MY_TELEGRAM_BOT.sendMsg(deleteMessage);
 
         }
 

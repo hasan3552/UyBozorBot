@@ -2,7 +2,9 @@ package com.company.util;
 
 import com.company.db.Database;
 import com.company.enums.Language;
+import com.company.enums.Role;
 import com.company.model.Category;
+import com.company.model.Product;
 import com.company.model.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
@@ -11,6 +13,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class KeyboardUtil {
@@ -32,6 +36,7 @@ public class KeyboardUtil {
 
 
         markup.setKeyboard(rowList);
+        markup.setOneTimeKeyboard(true);
         return markup;
     }
 
@@ -97,7 +102,7 @@ public class KeyboardUtil {
         KeyboardRow row2 = new KeyboardRow();
 
         KeyboardButton button4 = new KeyboardButton(language.equals(Language.UZ) ?
-                 DemoUtil.LIKED_UZ: DemoUtil.LIKED_RU);
+                DemoUtil.LIKED_UZ : DemoUtil.LIKED_RU);
         row2.add(button4);
         KeyboardButton button5 = new KeyboardButton(language.equals(Language.UZ) ?
                 DemoUtil.SETTING_UZ : DemoUtil.SETTING_RU);
@@ -116,14 +121,17 @@ public class KeyboardUtil {
         List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
 
         for (Category category : categories) {
+            if (!category.getIsDeleted()) {
 
-            List<InlineKeyboardButton> row = new ArrayList<>();
-            InlineKeyboardButton button = new InlineKeyboardButton();
-            button.setText(language.equals(Language.UZ) ? category.getNameUz() : category.getNameRu());
-            button.setCallbackData("C/"+category.getCategoryId());
-            row.add(button);
-            rowList.add(row);
+                List<InlineKeyboardButton> row = new ArrayList<>();
+                InlineKeyboardButton button = new InlineKeyboardButton();
 
+                button.setText(language.equals(Language.UZ) ? category.getNameUz() : category.getNameRu());
+                button.setCallbackData("C/" + category.getId() + "/0");
+                System.out.println("C/" + category.getId() + "/0");
+                row.add(button);
+                rowList.add(row);
+            }
         }
 
         List<InlineKeyboardButton> row1 = new ArrayList<>();
@@ -135,7 +143,6 @@ public class KeyboardUtil {
 
         markup.setKeyboard(rowList);
         return markup;
-
 
     }
 
@@ -171,6 +178,295 @@ public class KeyboardUtil {
         markup.setKeyboard(rowList);
         markup.setResizeKeyboard(true);
 
+        return markup;
+
+    }
+
+    public static InlineKeyboardMarkup getProduct
+            (List<Product> products, long productId, int categoryId, Language language, User user) {
+
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
+
+        List<InlineKeyboardButton> row = new ArrayList<>();
+        Product product = products.get((int) productId);
+
+        if (productId != 0) {
+
+            InlineKeyboardButton button = new InlineKeyboardButton();
+            button.setText("⏪");
+            button.setCallbackData("C/" + categoryId + "/" + (productId - 1));
+            row.add(button);
+
+        }
+
+        InlineKeyboardButton button4 = new InlineKeyboardButton();
+        button4.setText("\uD83D\uDDA4");
+        button4.setCallbackData("Liked" + (product.getId()) + "/" + user.getId());
+        row.add(button4);
+
+        if (products.size() != productId + 1) {
+
+            InlineKeyboardButton button1 = new InlineKeyboardButton();
+            button1.setText("⏩");
+            button1.setCallbackData("C/" + categoryId + "/" + (productId + 1));
+            row.add(button1);
+
+        }
+        rowList.add(row);
+
+        List<InlineKeyboardButton> row1 = new ArrayList<>();
+        InlineKeyboardButton button1 = new InlineKeyboardButton();
+        button1.setText(language.equals(Language.UZ) ? "\uD83D\uDCCC Joylashuv" : "\uD83D\uDCCC Место нахождения");
+        button1.setCallbackData("Loc/" + (product.getId()));
+        row1.add(button1);
+
+        InlineKeyboardButton button = new InlineKeyboardButton();
+        button.setText("\uD83D\uDCDE");
+        button.setCallbackData("Call/" + (product.getId()));
+        row1.add(button);
+
+        rowList.add(row1);
+
+        List<InlineKeyboardButton> row2 = new ArrayList<>();
+        InlineKeyboardButton button2 = new InlineKeyboardButton();
+        button2.setText(language.equals(Language.UZ) ? "\uD83D\uDD1A Chiqish" : "\uD83D\uDD1A Выход");
+        button2.setCallbackData(DemoUtil.BACK);
+        row2.add(button2);
+        rowList.add(row2);
+
+        markup.setKeyboard(rowList);
+        return markup;
+
+    }
+
+    public static InlineKeyboardMarkup getProductLiked
+            (int step, Language language, int productId, int likedSize) {
+
+
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
+
+        List<InlineKeyboardButton> row = new ArrayList<>();
+
+        if (step != 0) {
+
+            InlineKeyboardButton button = new InlineKeyboardButton();
+            button.setText("⏪");
+            button.setCallbackData("Lleft/" + step);
+            row.add(button);
+
+        }
+
+        InlineKeyboardButton button4 = new InlineKeyboardButton();
+        button4.setText("\uD83D\uDDD1");
+        button4.setCallbackData("D/" + productId);
+        row.add(button4);
+
+
+        if (step + 1 < likedSize) {
+
+            InlineKeyboardButton button1 = new InlineKeyboardButton();
+            button1.setText("⏩");
+            button1.setCallbackData("Lright/" + step);
+            row.add(button1);
+
+        }
+        rowList.add(row);
+
+        List<InlineKeyboardButton> row2 = new ArrayList<>();
+        InlineKeyboardButton button2 = new InlineKeyboardButton();
+        button2.setText(language.equals(Language.UZ) ? "\uD83D\uDD1A Chiqish" : "\uD83D\uDD1A Выход");
+        button2.setCallbackData(DemoUtil.BACK);
+        row2.add(button2);
+        rowList.add(row2);
+
+        markup.setKeyboard(rowList);
+        return markup;
+
+    }
+
+    public static ReplyKeyboardMarkup getAdminMenu(Language language) {
+
+        ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup();
+        List<KeyboardRow> rowList = new ArrayList<>();
+
+        KeyboardRow row = new KeyboardRow();
+        KeyboardButton button = new KeyboardButton(language.equals(Language.UZ) ?
+                DemoUtil.CATEGORY_CRUD_UZ : DemoUtil.CATEGORY_CRUD_RU);
+        row.add(button);
+        KeyboardButton button1 = new KeyboardButton(language.equals(Language.UZ) ?
+                DemoUtil.CUSTOMER_CRUD_UZ : DemoUtil.CUSTOMER_CRUD_RU);
+        row.add(button1);
+        rowList.add(row);
+
+        KeyboardRow row1 = new KeyboardRow();
+        KeyboardButton button2 = new KeyboardButton(language.equals(Language.UZ) ?
+                DemoUtil.REKLAMA_PRODUCT_UZ : DemoUtil.REKLAMA_PRODUCT_RU);
+        row1.add(button2);
+        KeyboardButton button3 = new KeyboardButton(language.equals(Language.UZ) ?
+                DemoUtil.SETTING_UZ : DemoUtil.SETTING_RU);
+        row1.add(button3);
+        rowList.add(row1);
+
+        KeyboardRow row2 = new KeyboardRow();
+        KeyboardButton button4 = new KeyboardButton(language.equals(Language.UZ) ?
+                DemoUtil.REKLAMA_GENERAL_UZ : DemoUtil.REKLAMA_GENERAL_RU);
+        row2.add(button4);
+        KeyboardButton button5 = new KeyboardButton(language.equals(Language.UZ) ?
+                DemoUtil.ADD_ADMIN_UZ : DemoUtil.ADD_ADMIN_RU);
+        row2.add(button5);
+        rowList.add(row2);
+
+        markup.setKeyboard(rowList);
+        markup.setResizeKeyboard(true);
+        return markup;
+    }
+
+    public static InlineKeyboardMarkup getMainCategory(Language language) {
+
+        List<Category> categories = Database.categories.stream()
+                .filter(category -> category.getCategoryId() == 0 && !category.getIsDeleted())
+                .toList();
+
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
+
+        for (Category category : categories) {
+
+            List<InlineKeyboardButton> row = new ArrayList<>();
+            InlineKeyboardButton button = new InlineKeyboardButton();
+            button.setText(language.equals(Language.UZ) ? category.getNameUz() : category.getNameRu());
+            button.setCallbackData("ct/" + category.getId());
+            row.add(button);
+            rowList.add(row);
+
+        }
+
+        List<InlineKeyboardButton> row2 = new ArrayList<>();
+        InlineKeyboardButton button2 = new InlineKeyboardButton();
+        button2.setText(language.equals(Language.UZ) ? "\uD83D\uDD1A Chiqish" : "\uD83D\uDD1A Выход");
+        button2.setCallbackData(DemoUtil.BACK);
+        row2.add(button2);
+        rowList.add(row2);
+
+        markup.setKeyboard(rowList);
+        return markup;
+    }
+
+    public static InlineKeyboardMarkup getSendAdminProductRequest(Long customerId, Long productId) {
+
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
+
+        List<InlineKeyboardButton> row = new ArrayList<>();
+        InlineKeyboardButton button = new InlineKeyboardButton();
+        button.setText("✅");
+        button.setCallbackData("✅/" + customerId + "/" + productId);
+        row.add(button);
+
+        InlineKeyboardButton button1 = new InlineKeyboardButton();
+        button1.setText("❌");
+        button1.setCallbackData("❌/" + customerId + "/" + productId);
+        row.add(button1);
+
+        rowList.add(row);
+        markup.setKeyboard(rowList);
+
+        return markup;
+    }
+
+    public static InlineKeyboardMarkup getShowMyProduct(
+            Long userId, Language language, int productId, List<Product> products) {
+
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
+
+        List<InlineKeyboardButton> row = new ArrayList<>();
+        if (productId != 0) {
+
+            InlineKeyboardButton button = new InlineKeyboardButton();
+            button.setText("⏪");
+            button.setCallbackData("My/" + userId + "/" + (productId - 1));
+            row.add(button);
+        }
+
+        Long id = products.get(productId).getId();
+
+        InlineKeyboardButton button = new InlineKeyboardButton();
+        button.setText("\uD83D\uDDD1");
+        button.setCallbackData("MyD/" + userId + "/" + id);
+        row.add(button);
+
+        if (products.size() - 1 > productId) {
+
+            InlineKeyboardButton button1 = new InlineKeyboardButton();
+            button1.setText("⏩");
+            button1.setCallbackData("My/" + userId + "/" + (productId + 1));
+            row.add(button1);
+        }
+
+        rowList.add(row);
+
+        List<InlineKeyboardButton> row2 = new ArrayList<>();
+        InlineKeyboardButton button2 = new InlineKeyboardButton();
+        button2.setText(language.equals(Language.UZ) ? "\uD83D\uDD1A Chiqish" : "\uD83D\uDD1A Выход");
+        button2.setCallbackData(DemoUtil.BACK);
+        row2.add(button2);
+        rowList.add(row2);
+
+        markup.setKeyboard(rowList);
+        return markup;
+
+    }
+
+    public static InlineKeyboardMarkup getAdminAddOrRevoke(Language language) {
+
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
+
+        List<User> users = Database.customers.stream()
+                .filter(user -> !user.getRole().equals(Role.SUPER_ADMIN) && !user.getIsBlocked())
+                .toList();
+
+        //Collections.sort(users);
+
+        for (User user : users) {
+            List<InlineKeyboardButton> row = new ArrayList<>();
+
+            InlineKeyboardButton button = new InlineKeyboardButton();
+            button.setText(user.getId()+"   ROLE:"+user.getRole());
+            button.setCallbackData("AR/"+user.getId());
+            row.add(button);
+            rowList.add(row);
+        }
+
+        List<InlineKeyboardButton> row2 = new ArrayList<>();
+        InlineKeyboardButton button2 = new InlineKeyboardButton();
+        button2.setText(language.equals(Language.UZ) ? "\uD83D\uDD1A Chiqish" : "\uD83D\uDD1A Выход");
+        button2.setCallbackData(DemoUtil.BACK);
+        row2.add(button2);
+        rowList.add(row2);
+
+        markup.setKeyboard(rowList);
+        return markup;
+
+    }
+
+
+    public static ReplyKeyboardMarkup getRefresh() {
+
+        ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup();
+        markup.setResizeKeyboard(true);
+        markup.setOneTimeKeyboard(true);
+
+        List<KeyboardRow> rowList = new ArrayList<>();
+        KeyboardRow row = new KeyboardRow();
+        KeyboardButton button = new KeyboardButton("\uD83D\uDD01REFRESH");
+        row.add(button);
+        rowList.add(row);
+
+        markup.setKeyboard(rowList);
         return markup;
 
     }

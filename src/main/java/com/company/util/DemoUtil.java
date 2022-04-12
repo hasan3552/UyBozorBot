@@ -17,14 +17,33 @@ public interface DemoUtil {
     String FIELD_YARD_UZ = "\uD83C\uDFD5 Dala hovli";
     String FIELD_YARD_RU = "\uD83C\uDFD5 Дача";
 
-    String MY_REKLAMA_UZ = "\uD83D\uDCEC E'lonlarim ";
+    String MY_REKLAMA_UZ = "\uD83D\uDCEC E'lonlarim";
     String MY_REKLAMA_RU = "\uD83D\uDCEC Мои объявления";
 
     String GIVE_REKLAMA_UZ = "\uD83D\uDCE4 E'lon berish";
     String GIVE_REKLAMA_RU = "\uD83D\uDCE4 Рекламировать";
 
-    String LIKED_UZ = "\uD83D\uDDA4 Saralanganlar ";
+    String LIKED_UZ = "\uD83D\uDDA4 Saralanganlar";
     String LIKED_RU = "\uD83D\uDDA4 Выбрано";
+
+    String CATEGORY_CRUD_UZ = "\uD83D\uDCC8 Kategoriya CRUD";
+    String CATEGORY_CRUD_RU = "\uD83D\uDCC8 Категория CRUD";
+
+    String CUSTOMER_CRUD_UZ = "\uD83D\uDC65 Mijoz CRUD";
+    String CUSTOMER_CRUD_RU = "\uD83D\uDC65 Клиент CRUD";
+
+    String REKLAMA_PRODUCT_UZ = "\uD83D\uDCE4 E'lon berish";
+    String REKLAMA_PRODUCT_RU = "\uD83D\uDCE4 Реклама";
+
+    String REKLAMA_GENERAL_UZ = "\uD83D\uDCED Umumiy reklama";
+    String REKLAMA_GENERAL_RU = "\uD83D\uDCED Общая реклама";
+
+    String ADD_ADMIN_UZ =  "➕ Admin ➖";
+    String ADD_ADMIN_RU = "➕ Aдмин ➖";
+
+
+
+
 
     String SETTING_UZ = "⚙️ Sozlamalar";
     String SETTING_RU = "⚙️ Настройки";

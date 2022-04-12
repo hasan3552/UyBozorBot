@@ -2,6 +2,7 @@ package com.company.db;
 
 
 import com.company.enums.Language;
+import com.company.enums.ProductStatus;
 import com.company.enums.Role;
 import com.company.enums.Status;
 import com.company.model.*;
@@ -22,7 +23,6 @@ public class DbConnection {
         String readFromCategory = "SELECT * FROM category ORDER BY id";
         String readFromLocation = "SELECT * FROM location ORDER BY id";
         String readFromProduct = "SELECT * FROM product ORDER  BY id";
-        String readFromPhoto = "SELECT * FROM photo ORDER  BY id";
         String readFromLiked = "SELECT * FROM liked ORDER  BY id";
 
         try {
@@ -67,17 +67,16 @@ public class DbConnection {
 
             while (resultSet2.next()) {
 
-                int id = resultSet2.getInt("id");
+                Integer id = resultSet2.getInt("id");
                 String nameUz = resultSet2.getString("name_uz");
                 String nameRu = resultSet2.getString("name_ru");
-                int categoryId = resultSet2.getInt("category_id");
-                boolean isDeleted = resultSet2.getBoolean("is_deleted");
+                Integer categoryId = resultSet2.getInt("category_id");
+                Boolean isDeleted = resultSet2.getBoolean("is_deleted");
 
                 Category category = new Category(id, nameUz, nameRu, categoryId, isDeleted);
                 Database.categories.add(category);
 
             }
-
 
             ResultSet resultSet = statement.executeQuery(readFromLocation);
 
@@ -106,24 +105,17 @@ public class DbConnection {
                 Timestamp when = resultSet1.getTimestamp("when");
                 boolean isDeleted = resultSet1.getBoolean("is_deleted");
                 boolean isSending = resultSet1.getBoolean("is_sending");
+                String fileId = resultSet1.getString("file_id");
+                String status = resultSet1.getString("status");
 
-                Product product = new Product(id,userId,text,locationId,contactProduct
-                ,categoryId,when.toLocalDateTime(),isDeleted,isSending);
+                ProductStatus status1 = Database.productStatuses.stream()
+                        .filter(productStatus -> productStatus.name().equals(status))
+                        .findAny().get();
+
+                Product product = new Product(id, userId, categoryId, text, locationId
+                        , contactProduct, when.toLocalDateTime(), fileId, isDeleted, isSending,status1);
                 Database.products.add(product);
 
-            }
-
-            ResultSet resultSet4 = statement.executeQuery(readFromPhoto);
-
-            while (resultSet4.next()) {
-
-                long id = resultSet4.getLong("id");
-                String fileId = resultSet4.getString("file_id");
-                long productId = resultSet4.getLong("product_id");
-                boolean isDeleted = resultSet4.getBoolean("is_deleted");
-
-                Photo photo = new Photo(id,fileId,productId,isDeleted);
-                Database.photos.add(photo);
             }
 
             ResultSet resultSet5 = statement.executeQuery(readFromLiked);
@@ -135,7 +127,7 @@ public class DbConnection {
                 long productId = resultSet5.getLong("product_id");
                 boolean isDeleted = resultSet5.getBoolean("is_deleted");
 
-                Liked liked = new Liked(id,userId,productId,isDeleted);
+                Liked liked = new Liked(id, userId, productId, isDeleted);
                 Database.likeds.add(liked);
             }
 
