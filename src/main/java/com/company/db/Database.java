@@ -1,9 +1,6 @@
 package com.company.db;
 
-import com.company.enums.Language;
-import com.company.enums.ProductStatus;
-import com.company.enums.Role;
-import com.company.enums.Status;
+import com.company.enums.*;
 import com.company.model.*;
 
 import java.util.ArrayList;
@@ -16,6 +13,7 @@ public class Database {
     public static final List<Role> ROLES = new ArrayList<>();
     public static List<Status> statuses=  new ArrayList<>();
     public static List<ProductStatus> productStatuses = new ArrayList<>();
+    public static List<AdStatus> adStatuses = new ArrayList<>();
 
     public static List<User> customers = new ArrayList<>();
     public static List<Category> categories = new ArrayList<>();
@@ -23,7 +21,6 @@ public class Database {
     public static List<Product> products = new ArrayList<>();
     public static List<Liked> likeds = new ArrayList<>();
     public static List<Advertisement> advertisements = new ArrayList<>();
-    public static List<InlineAdvertisement> inlineAdvertisements = new ArrayList<>();
 
 
 
@@ -49,6 +46,13 @@ public class Database {
         productStatuses.add(ProductStatus.REQUEST);
 
         // in progress
+
+        adStatuses.add(AdStatus.NEW);
+        adStatuses.add(AdStatus.HAS_PHOTO);
+        adStatuses.add(AdStatus.HAS_CAPTION);
+        adStatuses.add(AdStatus.HAS_URL);
+        adStatuses.add(AdStatus.HAS_INLINE_NAME);
+        adStatuses.add(AdStatus.READY);
     }
 
 }

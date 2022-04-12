@@ -17,9 +17,9 @@ import java.util.regex.Pattern;
 
 public class SettingService extends Thread {
 
-    private Message message;
-    private User user;
-    private Language language;
+    public Message message;
+    public User user;
+    public Language language;
 
     public SettingService(Message message, User user) {
         this.message = message;

@@ -32,17 +32,22 @@ public interface DemoUtil {
     String CUSTOMER_CRUD_UZ = "\uD83D\uDC65 Mijoz CRUD";
     String CUSTOMER_CRUD_RU = "\uD83D\uDC65 Клиент CRUD";
 
+    String CONFIRM = "_confirm";
+
+    String CATEGORY_CREATE = "category_create";
+    String CATEGORY_SHOW = "category_show";
+    String CATEGORY_UPDATE = "category_update";
+    String CATEGORY_DELETED = "category_deleted";
+
+
     String REKLAMA_PRODUCT_UZ = "\uD83D\uDCE4 E'lon berish";
     String REKLAMA_PRODUCT_RU = "\uD83D\uDCE4 Реклама";
 
     String REKLAMA_GENERAL_UZ = "\uD83D\uDCED Umumiy reklama";
     String REKLAMA_GENERAL_RU = "\uD83D\uDCED Общая реклама";
 
-    String ADD_ADMIN_UZ =  "➕ Admin ➖";
+    String ADD_ADMIN_UZ = "➕ Admin ➖";
     String ADD_ADMIN_RU = "➕ Aдмин ➖";
-
-
-
 
 
     String SETTING_UZ = "⚙️ Sozlamalar";

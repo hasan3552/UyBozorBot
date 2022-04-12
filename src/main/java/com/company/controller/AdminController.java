@@ -1,35 +1,23 @@
 package com.company.controller;
 
 import com.company.Main;
-import com.company.db.Database;
 import com.company.enums.Language;
-import com.company.enums.ProductStatus;
-import com.company.enums.Role;
 import com.company.enums.Status;
-import com.company.model.Product;
 import com.company.model.User;
 import com.company.service.AdminService;
 import com.company.service.AdvertisementService;
 import com.company.service.SettingService;
 import com.company.service.UserService;
 import com.company.util.DemoUtil;
-import com.company.util.KeyboardUtil;
-import lombok.Getter;
-import lombok.Setter;
-import org.telegram.telegrambots.meta.api.methods.ParseMode;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
-@Getter
-@Setter
 public class AdminController extends Thread {
 
-    private Message message;
-    private User user;
-    private Language language;
+    public Message message;
+    public User user;
+    public Language language;
 
     public AdminController(Message message, User user) {
         this.message = message;
@@ -89,10 +77,11 @@ public class AdminController extends Thread {
 
             UserService userService = new UserService(message, user);
             userService.sendProductInfo();
+
         }else if (user.getStatus().equals(Status.PREMIUM_REKLAMA)){
 
             AdvertisementService advertisementService = new AdvertisementService(message,user);
-            advertisementService.start();
+            advertisementService.create();
 
         }
 
@@ -136,6 +125,11 @@ public class AdminController extends Thread {
 
             AdminService adminService = new AdminService(message,user);
             adminService.workAdministrator(data);
+
+        }else if (data.equals(DemoUtil.CONFIRM)){
+
+            AdvertisementService service = new AdvertisementService(message,user);
+            service.start();
 
         }
     }

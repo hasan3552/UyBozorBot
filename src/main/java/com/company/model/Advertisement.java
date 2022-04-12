@@ -19,14 +19,15 @@ public class Advertisement {
     private Integer id;
     private String body;
     private String photo;
-    private LocalDateTime when= LocalDateTime.now();
-    private Double price;
+    private String inlineName;
+    private String inlineUrl;
+    private LocalDateTime when = LocalDateTime.now();
     private AdStatus status = AdStatus.NEW;
     private Boolean isDeleted = false;
-    private Boolean isBlocked = false;
+    private Boolean isSending = false;
 
-    public Advertisement(String photo) {
-        id = Database.advertisements.size()+1;
-        this.photo = photo;
+    public Advertisement() {
+        id = Database.advertisements.size() + 1;
+
     }
 }

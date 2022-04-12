@@ -7,8 +7,6 @@ import com.company.enums.Role;
 import com.company.enums.Status;
 import com.company.model.*;
 import com.company.util.KeyboardUtil;
-import lombok.Getter;
-import lombok.Setter;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendContact;
 import org.telegram.telegrambots.meta.api.methods.send.SendLocation;
@@ -25,13 +23,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-@Getter
-@Setter
 public class UserService extends Thread {
 
-    private Message message;
-    private User user;
-    private Language language;
+    public Message message;
+    public User user;
+    public Language language;
 
     public UserService(Message message, User user) {
         this.message = message;
@@ -389,10 +385,10 @@ public class UserService extends Thread {
         sendMessage.setChatId(String.valueOf(user.getId()));
 
         if (message.hasText()) {
-            if (user.getRole().equals(Role.CUSTOMER)){
+            if (user.getRole().equals(Role.CUSTOMER)) {
 
                 user.setStatus(Status.MENU);
-            }else {
+            } else {
 
                 user.setStatus(Status.ADMIN_MENU);
             }
@@ -576,7 +572,7 @@ public class UserService extends Thread {
 
     public void refresh() {
 
-        if (user.getRole().equals(Role.ADMIN)){
+        if (user.getRole().equals(Role.ADMIN)) {
             user.setStatus(Status.ADMIN_MENU);
 
             SendMessage sendMessage = new SendMessage();
@@ -588,7 +584,7 @@ public class UserService extends Thread {
             sendMessage.setReplyMarkup(adminMenu);
 
             Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
-        }else {
+        } else {
             user.setStatus(Status.MENU);
 
             SendMessage sendMessage = new SendMessage();
@@ -602,5 +598,32 @@ public class UserService extends Thread {
             Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
 
         }
+    }
+
+    public void myReklama() {
+
+        user.setStatus(Status.USER_SHOW_OWN_PRODUCT);
+        SendPhoto sendPhoto = new SendPhoto();
+        sendPhoto.setChatId(String.valueOf(user.getId()));
+
+        List<Product> products = Database.products.stream()
+                .filter(product -> product.getUserId() == (long) user.getId() && product.getIsSending() &&
+                        !product.getIsDeleted()).toList();
+
+        InputFile inputFile = new InputFile(products.get(0).getFileId());
+        sendPhoto.setPhoto(inputFile);
+
+        InlineKeyboardMarkup showMyProduct =
+                KeyboardUtil.getShowMyProduct(user.getId(), language, 0, products);
+        sendPhoto.setReplyMarkup(showMyProduct);
+        sendPhoto.setCaption(products.get(0).getText());
+
+        Main.MY_TELEGRAM_BOT.sendMsg(sendPhoto);
+
+        DeleteMessage deleteMessage = new DeleteMessage();
+        deleteMessage.setChatId(String.valueOf(message.getChatId()));
+        deleteMessage.setMessageId(message.getMessageId());
+        Main.MY_TELEGRAM_BOT.sendMsg(deleteMessage);
+
     }
 }

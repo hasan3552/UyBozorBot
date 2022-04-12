@@ -6,6 +6,7 @@ public enum AdStatus {
     HAS_PHOTO,
     HAS_CAPTION,
     HAS_URL,
+    HAS_INLINE_NAME,
     READY,
 
 }

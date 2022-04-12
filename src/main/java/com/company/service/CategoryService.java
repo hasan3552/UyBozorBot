@@ -22,9 +22,9 @@ import java.util.List;
 
 public class CategoryService extends Thread {
 
-    private Message message;
-    private User user;
-    private Language language;
+    public Message message;
+    public User user;
+    public Language language;
 
     public CategoryService(Message message, User user) {
         this.message = message;
@@ -169,5 +169,19 @@ public class CategoryService extends Thread {
 
 
         }
+    }
+
+    public void crud() {
+        user.setStatus(Status.CATEGORY_CRUD);
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(String.valueOf(user.getId()));
+        sendMessage.setText(language.equals(Language.UZ) ? "Kategoriya CRUD menyusi." : "Категория CRUD меню");
+
+        InlineKeyboardMarkup categoryCRUD = KeyboardUtil.getCategoryCRUD(language);
+        sendMessage.setReplyMarkup(categoryCRUD);
+
+        Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
+
     }
 }

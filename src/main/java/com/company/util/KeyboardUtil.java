@@ -6,6 +6,7 @@ import com.company.enums.Role;
 import com.company.model.Category;
 import com.company.model.Product;
 import com.company.model.User;
+import org.telegram.telegrambots.meta.api.objects.LoginUrl;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -33,7 +34,6 @@ public class KeyboardUtil {
 
         row.add(button);
         rowList.add(row);
-
 
         markup.setKeyboard(rowList);
         markup.setOneTimeKeyboard(true);
@@ -469,5 +469,102 @@ public class KeyboardUtil {
         markup.setKeyboard(rowList);
         return markup;
 
+    }
+
+    public static InlineKeyboardMarkup getRequestAdvertisementFromAdmin(String inlineName, String inlineUrl) {
+
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
+
+        List<InlineKeyboardButton> row= new ArrayList<>();
+        InlineKeyboardButton button = new InlineKeyboardButton();
+        button.setText(inlineName);
+        button.setCallbackData("reklama");
+
+        //LoginUrl loginUrl = new LoginUrl(inlineUrl);
+        button.setUrl(inlineUrl);
+        row.add(button);
+        rowList.add(row);
+
+        List<InlineKeyboardButton> row1 = new ArrayList<>();
+        InlineKeyboardButton button1 = new InlineKeyboardButton();
+        button1.setText("✅");
+        button1.setCallbackData(DemoUtil.CONFIRM);
+        row1.add(button1);
+
+        InlineKeyboardButton button2 = new InlineKeyboardButton();
+        button2.setText("❌");
+        button2.setCallbackData(DemoUtil.BACK);
+        row1.add(button2);
+
+        rowList.add(row1);
+
+        markup.setKeyboard(rowList);
+        return markup;
+    }
+
+    public static InlineKeyboardMarkup getReklama(String inlineName, String inlineUrl) {
+
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
+        List<InlineKeyboardButton> row = new ArrayList<>();
+        InlineKeyboardButton button = new InlineKeyboardButton();
+        button.setText(inlineName);
+        button.setCallbackData("reklama");
+        button.setUrl(inlineUrl);
+        row.add(button);
+        rowList.add(row);
+        markup.setKeyboard(rowList);
+
+        return markup;
+    }
+
+    public static InlineKeyboardMarkup getCategoryCRUD(Language language) {
+
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
+
+        List<InlineKeyboardButton> row = new ArrayList<>();
+        InlineKeyboardButton button = new InlineKeyboardButton();
+        button.setText(language.equals(Language.UZ) ? "➕ Kategoriya qo'shish." : "➕ Добавьте категорию.");
+        button.setCallbackData(DemoUtil.CATEGORY_CREATE);
+        row.add(button);
+        rowList.add(row);
+
+        List<InlineKeyboardButton> row1 = new ArrayList<>();
+        InlineKeyboardButton button1 = new InlineKeyboardButton();
+        button1.setText(language.equals(Language.UZ) ?
+                "\uD83D\uDCC6 Kategoriya ko'rish." : "\uD83D\uDCC6 Категория просмотра.");
+        button1.setCallbackData(DemoUtil.CATEGORY_SHOW);
+        row1.add(button1);
+        rowList.add(row1);
+
+        List<InlineKeyboardButton> row2 = new ArrayList<>();
+        InlineKeyboardButton button2 = new InlineKeyboardButton();
+        button2.setText(language.equals(Language.UZ) ?
+                "♻️ Kategoriya o'zgartirish." : "♻️ Смена категории.");
+        button2.setCallbackData(DemoUtil.CATEGORY_UPDATE);
+        row2.add(button2);
+        rowList.add(row2);
+
+
+        List<InlineKeyboardButton> row3 = new ArrayList<>();
+        InlineKeyboardButton button3 = new InlineKeyboardButton();
+        button3.setText(language.equals(Language.UZ) ?
+                "\uD83D\uDDD1 Kategoriya o'chirish." : "\uD83D\uDDD1 Удалить категорию.");
+        button3.setCallbackData(DemoUtil.CATEGORY_UPDATE);
+        row3.add(button3);
+        rowList.add(row3);
+
+
+        List<InlineKeyboardButton> row4 = new ArrayList<>();
+        InlineKeyboardButton button4 = new InlineKeyboardButton();
+        button4.setText(language.equals(Language.UZ) ? "\uD83D\uDD1A Chiqish" : "\uD83D\uDD1A Выход");
+        button4.setCallbackData(DemoUtil.BACK);
+        row4.add(button4);
+        rowList.add(row4);
+
+        markup.setKeyboard(rowList);
+        return markup;
     }
 }

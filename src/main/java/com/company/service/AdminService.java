@@ -6,12 +6,11 @@ import com.company.enums.Language;
 import com.company.enums.ProductStatus;
 import com.company.enums.Role;
 import com.company.enums.Status;
+import com.company.model.Advertisement;
 import com.company.model.Product;
 import com.company.model.User;
 import com.company.util.DemoUtil;
 import com.company.util.KeyboardUtil;
-import lombok.Getter;
-import lombok.Setter;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
@@ -19,13 +18,11 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
-@Getter
-@Setter
 public class AdminService extends Thread {
 
-    private Message message;
-    private User user;
-    private Language language;
+    public Message message;
+    public User user;
+    public Language language;
 
     public AdminService(Message message, User user) {
         this.message = message;
@@ -93,7 +90,15 @@ public class AdminService extends Thread {
             sendMessage.setText(language.equals(Language.UZ) ?
                     "Reklama uchun rasm jo'nating." : "Присылайте фото для рекламы.");
 
+            Advertisement advertisement = new Advertisement();
+            Database.advertisements.add(advertisement);
+
             Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
+
+        }else if (message.getText().equals(DemoUtil.CATEGORY_CRUD_UZ) || message.getText().equals(DemoUtil.CATEGORY_CRUD_RU)){
+
+            CategoryService categoryService = new CategoryService(message,user);
+            categoryService.crud();
 
         }
     }
