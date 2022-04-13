@@ -9,6 +9,7 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.*;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMedia;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -26,6 +27,7 @@ public class BotControl extends TelegramLongPollingBot {
     @Override
     public String getBotToken() {
         return "5228556568:AAHfxqvgWFAgvoWziMghG6W3KqsztACZZRQ";
+
     }
 
     @Override
@@ -67,7 +69,6 @@ public class BotControl extends TelegramLongPollingBot {
                 botService.start();
 
             }
-
         } else if (update.hasCallbackQuery()) {
 
             CallbackQuery callbackQuery = update.getCallbackQuery();
@@ -100,8 +101,6 @@ public class BotControl extends TelegramLongPollingBot {
             }
         }
     }
-
-
     public void sendMsg(SendLocation sendLocation) {
 
         try {

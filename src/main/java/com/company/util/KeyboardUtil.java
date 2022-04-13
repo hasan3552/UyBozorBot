@@ -435,8 +435,8 @@ public class KeyboardUtil {
             List<InlineKeyboardButton> row = new ArrayList<>();
 
             InlineKeyboardButton button = new InlineKeyboardButton();
-            button.setText(user.getId()+"   ROLE:"+user.getRole());
-            button.setCallbackData("AR/"+user.getId());
+            button.setText(user.getId() + "   ROLE:" + user.getRole());
+            button.setCallbackData("AR/" + user.getId());
             row.add(button);
             rowList.add(row);
         }
@@ -476,7 +476,7 @@ public class KeyboardUtil {
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
 
-        List<InlineKeyboardButton> row= new ArrayList<>();
+        List<InlineKeyboardButton> row = new ArrayList<>();
         InlineKeyboardButton button = new InlineKeyboardButton();
         button.setText(inlineName);
         button.setCallbackData("reklama");
@@ -563,8 +563,109 @@ public class KeyboardUtil {
         button4.setCallbackData(DemoUtil.BACK);
         row4.add(button4);
         rowList.add(row4);
+        markup.setKeyboard(rowList);
+        return markup;
+    }
+
+    public static InlineKeyboardMarkup getCustomerMenuForCrudOperation(User customer, Language language) {
+
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
+
+        List<InlineKeyboardButton> row = new ArrayList<>();
+        InlineKeyboardButton button = new InlineKeyboardButton();
+
+        button.setText(customer.getIsBlocked() ? language.equals(Language.UZ) ?
+                "\uD83D\uDD13 Blockdan yechish" : "\uD83D\uDD13 Разблокировать" : language.equals(Language.UZ) ?
+                "\uD83D\uDD10 Blocklash" : "\uD83D\uDD10 Блокировка");
+        button.setCallbackData("Block/" + (customer.getId()));
+        row.add(button);
+        rowList.add(row);
+
+        List<InlineKeyboardButton> row1 = new ArrayList<>();
+        InlineKeyboardButton button1 = new InlineKeyboardButton();
+        button1.setText(language.equals(Language.UZ) ? " \uD83D\uDD0E Mijozning e'lonlari "
+                : " \uD83D\uDD0E Объявления клиентов ");
+        button1.setCallbackData("Elon/" + (customer.getId())+"/0");
+        row1.add(button1);
+        rowList.add(row1);
+
+        List<InlineKeyboardButton> row2 = new ArrayList<>();
+        InlineKeyboardButton button2 = new InlineKeyboardButton();
+        button2.setText(customer.getLanguage().equals(Language.UZ) ? "\uD83D\uDD1A Chiqish" : "\uD83D\uDD1A Выход");
+        button2.setCallbackData(DemoUtil.BACK);
+        row2.add(button2);
+        rowList.add(row2);
 
         markup.setKeyboard(rowList);
         return markup;
+
+    }
+
+    public static InlineKeyboardMarkup getAllCustomers(Language language) {
+
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
+
+        List<User> customers = Database.customers.stream()
+                .filter(user -> user.getRole().equals(Role.CUSTOMER) || user.getRole().equals(Role.ADMIN))
+                .toList();
+
+        for (User customer : customers) {
+
+            List<InlineKeyboardButton> row = new ArrayList<>();
+            InlineKeyboardButton button = new InlineKeyboardButton();
+            button.setText(customer.getId() + "  ROLE:" + customer.getRole());
+            button.setCallbackData("Cus/" + customer.getId());
+            row.add(button);
+            rowList.add(row);
+
+        }
+
+        List<InlineKeyboardButton> row2 = new ArrayList<>();
+        InlineKeyboardButton button2 = new InlineKeyboardButton();
+        button2.setText(language.equals(Language.UZ) ? "\uD83D\uDD1A Chiqish" : "\uD83D\uDD1A Выход");
+        button2.setCallbackData(DemoUtil.BACK);
+        row2.add(button2);
+        rowList.add(row2);
+
+        markup.setKeyboard(rowList);
+        return markup;
+
+    }
+
+    public static ReplyKeyboardMarkup getContactAdmin() {
+
+        ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup();
+        markup.setResizeKeyboard(true);
+        markup.setOneTimeKeyboard(true);
+
+        List<KeyboardRow> rowList = new ArrayList<>();
+        KeyboardRow row = new KeyboardRow();
+        KeyboardButton button = new KeyboardButton("✏️ REQUEST");
+        row.add(button);
+        rowList.add(row);
+
+        markup.setKeyboard(rowList);
+        return markup;
+
+    }
+
+    public static InlineKeyboardMarkup getBlockedUserResponse(Long userId) {
+
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
+
+        List<InlineKeyboardButton> row = new ArrayList<>();
+        InlineKeyboardButton button = new InlineKeyboardButton();
+        button.setText("✏️ RESPONSE");
+        button.setCallbackData("RESPONSE/"+userId);
+        row.add(button);
+
+        rowList.add(row);
+        markup.setKeyboard(rowList);
+
+        return markup;
+
     }
 }

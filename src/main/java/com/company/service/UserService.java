@@ -1,11 +1,13 @@
 package com.company.service;
 
 import com.company.Main;
+import com.company.controller.BotControl;
 import com.company.db.Database;
 import com.company.enums.Language;
 import com.company.enums.Role;
 import com.company.enums.Status;
 import com.company.model.*;
+import com.company.util.DemoUtil;
 import com.company.util.KeyboardUtil;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendContact;
@@ -16,11 +18,13 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.PhotoSize;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ForceReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 public class UserService extends Thread {

@@ -1,14 +1,14 @@
 package com.company.controller;
 
 import com.company.Main;
+import com.company.db.Database;
 import com.company.enums.Language;
 import com.company.enums.Status;
 import com.company.model.User;
-import com.company.service.AdminService;
-import com.company.service.AdvertisementService;
-import com.company.service.SettingService;
-import com.company.service.UserService;
+import com.company.service.*;
 import com.company.util.DemoUtil;
+import com.company.util.KeyboardUtil;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -78,12 +78,35 @@ public class AdminController extends Thread {
             UserService userService = new UserService(message, user);
             userService.sendProductInfo();
 
-        }else if (user.getStatus().equals(Status.PREMIUM_REKLAMA)){
+        } else if (user.getStatus().equals(Status.PREMIUM_REKLAMA)) {
 
-            AdvertisementService advertisementService = new AdvertisementService(message,user);
+            AdvertisementService advertisementService = new AdvertisementService(message, user);
             advertisementService.create();
 
+        }else if (user.getStatus().equals(Status.ADMIN_WRITE_RESPONSE)){
+
+            User user2 = Database.customers.stream()
+                    .filter(user1 -> user1.getStatus().equals(Status.WAIT_RESPONSE))
+                    .findAny().get();
+
+            user2.setStatus(Status.USER_SHOW_LIKED);
+            user.setStatus(Status.ADMIN_MENU);
+
+            SendMessage sendMessage=  new SendMessage();
+            sendMessage.setChatId(String.valueOf(user2.getId()));
+            sendMessage.setText(message.getText());
+
+            Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
+
+            SendMessage sendMessage1 = new SendMessage();
+            sendMessage1.setChatId(String.valueOf(user.getId()));
+            sendMessage1.setText(language.equals(Language.UZ) ? "Javob uzatildi." : "Ответ прошел.");
+            sendMessage1.setReplyMarkup(KeyboardUtil.getAdminMenu(language));
+
+            Main.MY_TELEGRAM_BOT.sendMsg(sendMessage1);
+
         }
+
 
     }
 
@@ -110,6 +133,11 @@ public class AdminController extends Thread {
             AdminService adminService = new AdminService(message, user);
             adminService.rejectProduct(data);
 
+        } else if (data.startsWith("RESPONSE/")) {
+
+            AdminService adminService = new AdminService(message, user);
+            adminService.adminResponseBlokedUser(data);
+
         } else if (user.getStatus().equals(Status.SET_LANGUAGE) &&
                 (data.equals(DemoUtil.LANG_UZ) || data.equals(DemoUtil.LANG_RU))) {
 
@@ -123,13 +151,23 @@ public class AdminController extends Thread {
 
         } else if (data.startsWith("AR/")) {
 
-            AdminService adminService = new AdminService(message,user);
+            AdminService adminService = new AdminService(message, user);
             adminService.workAdministrator(data);
 
-        }else if (data.equals(DemoUtil.CONFIRM)){
+        } else if (data.equals(DemoUtil.CONFIRM)) {
 
-            AdvertisementService service = new AdvertisementService(message,user);
+            AdvertisementService service = new AdvertisementService(message, user);
             service.start();
+
+        } else if ((user.getStatus().equals(Status.ADMIN_CUSTOMER_CRUD)) && data.startsWith("Cus/")) {
+
+            AdminService adminService = new AdminService(message, user);
+            adminService.operationCrudCustomer(data);
+
+        } else if ((user.getStatus().equals(Status.ADMIN_CUSTOMER_CRUD)) && data.startsWith("Block/")) {
+
+            AdminService adminService = new AdminService(message, user);
+            adminService.customerBlockedOrUnblocked(data);
 
         }
     }

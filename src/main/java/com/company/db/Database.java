@@ -4,7 +4,9 @@ import com.company.enums.*;
 import com.company.model.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class Database {
@@ -24,7 +26,10 @@ public class Database {
 
 
 
+
     public static void compile(){
+
+
 
         LANGUAGES.add(Language.UZ);
         LANGUAGES.add(Language.RU);

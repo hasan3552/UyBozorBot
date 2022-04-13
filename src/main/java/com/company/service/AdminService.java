@@ -17,6 +17,9 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
+
+import javax.xml.crypto.Data;
 
 public class AdminService extends Thread {
 
@@ -68,21 +71,21 @@ public class AdminService extends Thread {
             deleteMessage.setMessageId(message.getMessageId());
             Main.MY_TELEGRAM_BOT.sendMsg(deleteMessage);
 
-        }else if (message.getText().equals(DemoUtil.ADD_ADMIN_UZ) || message.getText().equals(DemoUtil.ADD_ADMIN_RU)){
+        } else if (message.getText().equals(DemoUtil.ADD_ADMIN_UZ) || message.getText().equals(DemoUtil.ADD_ADMIN_RU)) {
 
-            if (user.getRole().equals(Role.ADMIN)){
+            if (user.getRole().equals(Role.ADMIN)) {
 
-                SendMessage sendMessage=  new SendMessage();
+                SendMessage sendMessage = new SendMessage();
                 sendMessage.setChatId(String.valueOf(user.getId()));
                 sendMessage.setText(language.equals(Language.UZ) ? "Kechirasiz sizga buning uchun ruhsat berilmagan."
                         : "Жаль, что тебе не разрешили это сделать.");
 
                 Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
-            }else {
+            } else {
 
                 addAdmin();
             }
-        }else if (message.getText().equals(DemoUtil.REKLAMA_GENERAL_UZ) || message.getText().equals(DemoUtil.REKLAMA_GENERAL_RU)){
+        } else if (message.getText().equals(DemoUtil.REKLAMA_GENERAL_UZ) || message.getText().equals(DemoUtil.REKLAMA_GENERAL_RU)) {
 
             user.setStatus(Status.PREMIUM_REKLAMA);
             SendMessage sendMessage = new SendMessage();
@@ -95,11 +98,32 @@ public class AdminService extends Thread {
 
             Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
 
-        }else if (message.getText().equals(DemoUtil.CATEGORY_CRUD_UZ) || message.getText().equals(DemoUtil.CATEGORY_CRUD_RU)){
+        } else if (message.getText().equals(DemoUtil.CATEGORY_CRUD_UZ) || message.getText().equals(DemoUtil.CATEGORY_CRUD_RU)) {
 
-            CategoryService categoryService = new CategoryService(message,user);
+            CategoryService categoryService = new CategoryService(message, user);
             categoryService.crud();
 
+        } else if ((message.getText().equals(DemoUtil.CUSTOMER_CRUD_RU) || message.getText().equals(DemoUtil.CUSTOMER_CRUD_UZ))) {
+
+            if (user.getRole().equals(Role.SUPER_ADMIN)) {
+
+                user.setStatus(Status.ADMIN_CUSTOMER_CRUD);
+
+                SendMessage sendMessage = new SendMessage();
+                sendMessage.setChatId(String.valueOf(user.getId()));
+                sendMessage.setText(language.equals(Language.UZ) ? "Mijozni tanlang." : "Выберите клиента.");
+                sendMessage.setReplyMarkup(KeyboardUtil.getAllCustomers(language));
+
+                Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
+            } else {
+
+                SendMessage sendMessage = new SendMessage();
+                sendMessage.setChatId(String.valueOf(user.getId()));
+                sendMessage.setText(language.equals(Language.UZ) ? "Kechirasiz sizga buning uchun ruhsat berilmagan."
+                        : "Жаль, что тебе не разрешили это сделать.");
+
+                Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
+            }
         }
     }
 
@@ -197,7 +221,7 @@ public class AdminService extends Thread {
 
             Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
 
-        }else {
+        } else {
 
             Database.products.stream()
                     .filter(product -> product.getId() == productId)
@@ -266,4 +290,117 @@ public class AdminService extends Thread {
 
     }
 
+    public void operationCrudCustomer(String data) {
+
+        String[] split = data.split("/");
+        long userId = Long.parseLong(split[1]);
+
+        User user2 = Database.customers.stream()
+                .filter(user1 -> user1.getId() == userId)
+                .findAny().get();
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(String.valueOf(user.getId()));
+
+        sendMessage.setText(user.getLanguage().equals(Language.UZ) ?
+                " TANLANG " : " ВЫБЕРИТЕ ");
+        sendMessage.setParseMode(ParseMode.HTML);
+
+        InlineKeyboardMarkup customerForCrudOperation =
+                KeyboardUtil.getCustomerMenuForCrudOperation(user2, language);
+        sendMessage.setReplyMarkup(customerForCrudOperation);
+
+        Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
+
+        DeleteMessage deleteMessage = new DeleteMessage();
+        deleteMessage.setChatId(String.valueOf(message.getChatId()));
+        deleteMessage.setMessageId(message.getMessageId());
+        Main.MY_TELEGRAM_BOT.sendMsg(deleteMessage);
+
+    }
+
+    public void customerBlockedOrUnblocked(String data) {
+
+        String[] split = data.split("/");
+        long userId = Long.parseLong(split[1]);
+
+        User user2 = Database.customers.stream()
+                .filter(user1 -> user1.getId() == userId)
+                .findAny().get();
+
+        SendMessage sendMessage1 = new SendMessage();
+        sendMessage1.setChatId(String.valueOf(user.getId()));
+        sendMessage1.setText(language.equals(Language.UZ) ? user2.getIsBlocked() ?
+                " Foydalanuvchi blokdan yechildi." : "Foydalanuvchi bloklandi." : user2.getIsBlocked() ?
+                " Пользователь разблокирован." : " Пользователь заблокирован.");
+        user.setStatus(Status.ADMIN_MENU);
+
+        Main.MY_TELEGRAM_BOT.sendMsg(sendMessage1);
+
+        if (user2.getIsBlocked()) {
+            user2.setIsBlocked(false);
+
+            SendMessage sendMessage = new SendMessage();
+            sendMessage.setChatId(String.valueOf(userId));
+            sendMessage.setText(user2.getLanguage().equals(Language.UZ) ?
+                    "Siz blokdan ochildingiz." : "Вы разблокировали блокировку.");
+
+            if (user2.getRole().equals(Role.CUSTOMER)) {
+                sendMessage.setReplyMarkup(KeyboardUtil.getMenu(user2.getLanguage()));
+                user2.setStatus(Status.MENU);
+            } else {
+                sendMessage.setReplyMarkup(KeyboardUtil.getAdminMenu(user2.getLanguage()));
+                user2.setStatus(Status.ADMIN_MENU);
+            }
+
+            Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
+        }else {
+            user2.setIsBlocked(true);
+
+            SendMessage sendMessage = new SendMessage();
+            sendMessage.setChatId(String.valueOf(userId));
+            sendMessage.setText(user2.getLanguage().equals(Language.UZ) ?
+                    "Hurmatli foydalanuvchi siz bloklandingiz. Agar admin bilan bog'lanmoqchi bo'lsangiz" +
+                            "✏️ REQUEST tugmasini bosing." : "Уважаемый пользователь, вы заблокированы. " +
+                    "Если вы хотите связаться с администратором, нажмите ✏️ REQUEST.");
+
+            ReplyKeyboardMarkup contactAdmin = KeyboardUtil.getContactAdmin();
+            sendMessage.setReplyMarkup(contactAdmin);
+
+            Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
+        }
+
+        DeleteMessage deleteMessage = new DeleteMessage();
+        deleteMessage.setChatId(String.valueOf(message.getChatId()));
+        deleteMessage.setMessageId(message.getMessageId());
+        Main.MY_TELEGRAM_BOT.sendMsg(deleteMessage);
+
+    }
+
+    public void adminResponseBlokedUser(String data) {
+
+        String[] split = data.split("/");
+        long userId = Long.parseLong(split[1]);
+
+        Database.customers.stream()
+                .filter(user1 -> user1.getId() == userId)
+                .findAny().get().setStatus(Status.WAIT_RESPONSE);
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(String.valueOf(user.getId()));
+        sendMessage.setText("<b>RESPONSE: </b>");
+        sendMessage.setParseMode(ParseMode.HTML);
+        sendMessage.setReplyMarkup(new ReplyKeyboardRemove(true));
+
+        user.setStatus(Status.ADMIN_WRITE_RESPONSE);
+
+        Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
+
+
+        DeleteMessage deleteMessage = new DeleteMessage();
+        deleteMessage.setChatId(String.valueOf(message.getChatId()));
+        deleteMessage.setMessageId(message.getMessageId());
+        Main.MY_TELEGRAM_BOT.sendMsg(deleteMessage);
+
+    }
 }
