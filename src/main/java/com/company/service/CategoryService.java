@@ -4,10 +4,8 @@ import com.company.Main;
 import com.company.db.Database;
 import com.company.enums.Language;
 import com.company.enums.Status;
-import com.company.model.Liked;
-import com.company.model.Location;
-import com.company.model.Product;
-import com.company.model.User;
+import com.company.model.*;
+import com.company.util.DemoUtil;
 import com.company.util.KeyboardUtil;
 import org.telegram.telegrambots.meta.api.methods.send.SendContact;
 import org.telegram.telegrambots.meta.api.methods.send.SendLocation;
@@ -112,7 +110,7 @@ public class CategoryService extends Thread {
             Integer locationId = product1.getLocationId();
 
             Location location1 = Database.locations.stream()
-                    .filter(location -> location.getId() ==(long) locationId)
+                    .filter(location -> location.getId() == (long) locationId)
                     .findAny().get();
 
 
@@ -167,7 +165,6 @@ public class CategoryService extends Thread {
             }
             Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
 
-
         }
     }
 
@@ -183,5 +180,83 @@ public class CategoryService extends Thread {
 
         Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
 
+
+        DeleteMessage deleteMessage = new DeleteMessage();
+        deleteMessage.setChatId(String.valueOf(message.getChatId()));
+        deleteMessage.setMessageId(message.getMessageId());
+        Main.MY_TELEGRAM_BOT.sendMsg(deleteMessage);
+
+    }
+
+    public void crudCallback(String data) {
+
+        if (data.equals(DemoUtil.CATEGORY_CREATE)) {
+            user.setStatus(Status.ADMIN_CREATE_CATEGORY);
+
+            InlineKeyboardMarkup mainCategory = KeyboardUtil.getMainCategory(language);
+
+            SendMessage sendMessage = new SendMessage();
+            sendMessage.setChatId(String.valueOf(user.getId()));
+            sendMessage.setText(language.equals(Language.UZ) ?
+                    "Qaysi bosh kategoriyaga qo'shmoqchisiz." : "Какую основную категорию вы хотите добавить.");
+            sendMessage.setReplyMarkup(mainCategory);
+
+            Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
+
+        } else if (data.equals(DemoUtil.CATEGORY_SHOW)) {
+            user.setStatus(Status.CATEGORY_CRUD);
+
+            String cateUz = "";
+            String cateRu = "";
+
+            for (Category category : Database.categories) {
+                if (!category.getIsDeleted()) {
+                    cateUz += category.getId() + ".  " + category.getNameUz() + " - " + category.getCategoryId() + "\n";
+                    cateRu += category.getId() + ".  " + category.getNameRu() + " - " + category.getCategoryId() + "\n";
+                }
+            }
+
+            SendMessage sendMessage = new SendMessage();
+            sendMessage.setChatId(String.valueOf(user.getId()));
+            sendMessage.setText(language.equals(Language.UZ) ?
+                    cateUz : cateRu);
+            sendMessage.setReplyMarkup(KeyboardUtil.getCategoryCRUD(language));
+
+            Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
+
+        } else if (data.equals(DemoUtil.CATEGORY_UPDATE)) {
+
+            user.setStatus(Status.ADMIN_UPDATE_CATEGORY);
+
+            InlineKeyboardMarkup mainCategory = KeyboardUtil.getMainCategory(language);
+
+            SendMessage sendMessage = new SendMessage();
+            sendMessage.setChatId(String.valueOf(user.getId()));
+            sendMessage.setText(language.equals(Language.UZ) ?
+                    "Bosh kategoriyani tanlang." : "Выберите общую категорию.");
+            sendMessage.setReplyMarkup(mainCategory);
+
+            Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
+
+        } else if (data.equals(DemoUtil.CATEGORY_DELETED)) {
+
+            user.setStatus(Status.ADMIN_DELETED_CATEGORY);
+
+            InlineKeyboardMarkup mainCategory = KeyboardUtil.getMainCategory(language);
+
+            SendMessage sendMessage = new SendMessage();
+            sendMessage.setChatId(String.valueOf(user.getId()));
+            sendMessage.setText(language.equals(Language.UZ) ?
+                    "Bosh kategoriyani tanlang." : "Выберите общую категорию.");
+            sendMessage.setReplyMarkup(mainCategory);
+
+            Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
+
+        }
+
+        DeleteMessage deleteMessage = new DeleteMessage();
+        deleteMessage.setChatId(String.valueOf(message.getChatId()));
+        deleteMessage.setMessageId(message.getMessageId());
+        Main.MY_TELEGRAM_BOT.sendMsg(deleteMessage);
     }
 }

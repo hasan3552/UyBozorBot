@@ -2,24 +2,26 @@ package com.company.service;
 
 import com.company.Main;
 import com.company.db.Database;
-import com.company.enums.Language;
-import com.company.enums.ProductStatus;
-import com.company.enums.Role;
-import com.company.enums.Status;
+import com.company.enums.*;
 import com.company.model.Advertisement;
+import com.company.model.Category;
 import com.company.model.Product;
 import com.company.model.User;
 import com.company.util.DemoUtil;
 import com.company.util.KeyboardUtil;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 
 import javax.xml.crypto.Data;
+import java.util.List;
+import java.util.Optional;
 
 public class AdminService extends Thread {
 
@@ -354,7 +356,7 @@ public class AdminService extends Thread {
             }
 
             Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
-        }else {
+        } else {
             user2.setIsBlocked(true);
 
             SendMessage sendMessage = new SendMessage();
@@ -395,6 +397,212 @@ public class AdminService extends Thread {
         user.setStatus(Status.ADMIN_WRITE_RESPONSE);
 
         Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
+
+
+        DeleteMessage deleteMessage = new DeleteMessage();
+        deleteMessage.setChatId(String.valueOf(message.getChatId()));
+        deleteMessage.setMessageId(message.getMessageId());
+        Main.MY_TELEGRAM_BOT.sendMsg(deleteMessage);
+
+    }
+
+    public void createCategory() {
+
+        Optional<Category> optional = Database.categories.stream()
+                .filter(category -> category.getStatus().equals(CategoryStatus.NEW))
+                .findAny();
+
+        if (optional.isPresent()) {
+
+            Category category = optional.get();
+            category.setNameUz(message.getText());
+            category.setStatus(CategoryStatus.HAS_NAME_UZ);
+
+            SendMessage sendMessage = new SendMessage();
+            sendMessage.setChatId(String.valueOf(user.getId()));
+            sendMessage.setText(language.equals(Language.UZ) ?
+                    "Categoriyaning nomi(ruscha) : " : "Название категории (рус.) : ");
+            Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
+
+        } else {
+            Optional<Category> optional1 = Database.categories.stream()
+                    .filter(category -> category.getStatus().equals(CategoryStatus.HAS_NAME_UZ))
+                    .findAny();
+
+            if (optional1.isPresent()) {
+
+                Category category = optional1.get();
+                category.setNameRu(message.getText());
+                category.setStatus(CategoryStatus.HAS_NAME_RU);
+                category.setIsDeleted(false);
+
+                user.setStatus(Status.ADMIN_MENU);
+
+                SendMessage sendMessage = new SendMessage();
+                sendMessage.setChatId(String.valueOf(user.getId()));
+                sendMessage.setText(language.equals(Language.UZ) ?
+                        "Yangi categoriya saqlandi. " : "Новая категория сохранена. ");
+                Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
+            }
+        }
+
+    }
+
+    public void createCategory(String data) {
+
+        String[] split = data.split("/");
+        int categoryId = Integer.parseInt(split[1]);
+
+        Category category = new Category(categoryId);
+        Database.categories.add(category);
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(String.valueOf(user.getId()));
+        sendMessage.setText(language.equals(Language.UZ) ?
+                "Categoriyaning nomi(o'zbek) : " : "Название категории (узбекский)");
+        Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
+
+        DeleteMessage deleteMessage = new DeleteMessage();
+        deleteMessage.setChatId(String.valueOf(message.getChatId()));
+        deleteMessage.setMessageId(message.getMessageId());
+        Main.MY_TELEGRAM_BOT.sendMsg(deleteMessage);
+
+    }
+
+    public void updatecategory(String data) {
+
+
+        if (data.startsWith("ct/")) {
+
+            AdminService adminService = new AdminService(message, user);
+            adminService.updatecategory(data);
+
+            String[] split = data.split("/");
+            int categoryId = Integer.parseInt(split[1]);
+
+            List<Category> categories = Database.categories.stream()
+                    .filter(category -> category.getCategoryId() == categoryId)
+                    .toList();
+
+            InlineKeyboardMarkup categoryMenuForUser = KeyboardUtil.getCategoryMenuForUser(categories, language);
+            SendMessage sendMessage = new SendMessage();
+            sendMessage.setChatId(String.valueOf(user.getId()));
+            sendMessage.setText(language.equals(Language.UZ) ?
+                    "Qaysi kategoriyani o'zgartirmoqchisiz." : "Какую категорию вы хотите изменить.");
+            sendMessage.setReplyMarkup(categoryMenuForUser);
+
+            Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
+
+            DeleteMessage deleteMessage = new DeleteMessage();
+            deleteMessage.setChatId(String.valueOf(message.getChatId()));
+            deleteMessage.setMessageId(message.getMessageId());
+            Main.MY_TELEGRAM_BOT.sendMsg(deleteMessage);
+
+        } else if (data.startsWith("C/")) {
+
+            String[] split = data.split("/");
+            int categoryId = Integer.parseInt(split[1]);
+            Category category1 = Database.categories.stream()
+                    .filter(category -> category.getId() == categoryId)
+                    .findAny().get();
+
+            category1.setIsDeleted(true);
+            category1.setStatus(CategoryStatus.NEW);
+            user.setStatus(Status.ADMIN_CREATE_CATEGORY);
+
+            SendMessage sendMessage = new SendMessage();
+            sendMessage.setChatId(String.valueOf(user.getId()));
+            sendMessage.setText(language.equals(Language.UZ) ?
+                    "Categoriyaning nomi(o'zbek) : " : "Название категории (узбекский)");
+            Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
+
+            DeleteMessage deleteMessage = new DeleteMessage();
+            deleteMessage.setChatId(String.valueOf(message.getChatId()));
+            deleteMessage.setMessageId(message.getMessageId());
+            Main.MY_TELEGRAM_BOT.sendMsg(deleteMessage);
+
+        }
+    }
+
+    public void deletedCategory(String data) {
+
+        if (data.startsWith("ct/")) {
+
+            AdminService adminService = new AdminService(message, user);
+            adminService.deletedCategory(data);
+
+            String[] split = data.split("/");
+            int categoryId = Integer.parseInt(split[1]);
+
+            List<Category> categories = Database.categories.stream()
+                    .filter(category -> category.getCategoryId() == categoryId)
+                    .toList();
+
+            InlineKeyboardMarkup categoryMenuForUser = KeyboardUtil.getCategoryMenuForUser(categories, language);
+
+            SendMessage sendMessage = new SendMessage();
+            sendMessage.setChatId(String.valueOf(user.getId()));
+            sendMessage.setText(language.equals(Language.UZ) ?
+                    "Qaysi kategoriyani o'chirmoqchisiz." : "Какую категорию вы хотите удалить?");
+            sendMessage.setReplyMarkup(categoryMenuForUser);
+
+            Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
+
+            DeleteMessage deleteMessage = new DeleteMessage();
+            deleteMessage.setChatId(String.valueOf(message.getChatId()));
+            deleteMessage.setMessageId(message.getMessageId());
+            Main.MY_TELEGRAM_BOT.sendMsg(deleteMessage);
+
+        } else if (data.startsWith("C/")) {
+
+            String[] split = data.split("/");
+            int categoryId = Integer.parseInt(split[1]);
+
+            Category category1 = Database.categories.stream()
+                    .filter(category -> category.getId() == categoryId)
+                    .findAny().get();
+
+            category1.setIsDeleted(true);
+            user.setStatus(Status.ADMIN_MENU);
+
+            SendMessage sendMessage = new SendMessage();
+            sendMessage.setChatId(String.valueOf(user.getId()));
+            sendMessage.setText(language.equals(Language.UZ) ?
+                    "Kategoriya o'chirildi." : "Категория удалена.");
+
+            Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
+
+            DeleteMessage deleteMessage = new DeleteMessage();
+            deleteMessage.setChatId(String.valueOf(message.getChatId()));
+            deleteMessage.setMessageId(message.getMessageId());
+            Main.MY_TELEGRAM_BOT.sendMsg(deleteMessage);
+
+        }
+    }
+
+    public void customerProduct(String data) {
+
+        String[] split = data.split("/");
+        long customerId = Long.parseLong(split[1]);
+        int step = Integer.parseInt(split[2]);
+
+        List<Product> products = Database.products.stream()
+                .filter(product -> product.getUserId() == customerId)
+                .toList();
+
+        Product product = products.get(step);
+
+        SendPhoto sendPhoto = new SendPhoto();
+        sendPhoto.setChatId(String.valueOf(user.getId()));
+
+        InputFile inputFile = new InputFile(product.getFileId());
+        sendPhoto.setPhoto(inputFile);
+        sendPhoto.setCaption(product.getText());
+
+        InlineKeyboardMarkup userProducts = KeyboardUtil.getUserProducts(step, language, customerId, products.size());
+        sendPhoto.setReplyMarkup(userProducts);
+
+        Main.MY_TELEGRAM_BOT.sendMsg(sendPhoto);
 
 
         DeleteMessage deleteMessage = new DeleteMessage();

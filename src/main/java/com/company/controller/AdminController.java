@@ -2,16 +2,25 @@ package com.company.controller;
 
 import com.company.Main;
 import com.company.db.Database;
+import com.company.enums.CategoryStatus;
 import com.company.enums.Language;
 import com.company.enums.Status;
+import com.company.model.Category;
+import com.company.model.Product;
 import com.company.model.User;
 import com.company.service.*;
 import com.company.util.DemoUtil;
 import com.company.util.KeyboardUtil;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+
+import java.util.List;
+import java.util.Optional;
 
 public class AdminController extends Thread {
 
@@ -83,7 +92,7 @@ public class AdminController extends Thread {
             AdvertisementService advertisementService = new AdvertisementService(message, user);
             advertisementService.create();
 
-        }else if (user.getStatus().equals(Status.ADMIN_WRITE_RESPONSE)){
+        } else if (user.getStatus().equals(Status.ADMIN_WRITE_RESPONSE)) {
 
             User user2 = Database.customers.stream()
                     .filter(user1 -> user1.getStatus().equals(Status.WAIT_RESPONSE))
@@ -92,7 +101,7 @@ public class AdminController extends Thread {
             user2.setStatus(Status.USER_SHOW_LIKED);
             user.setStatus(Status.ADMIN_MENU);
 
-            SendMessage sendMessage=  new SendMessage();
+            SendMessage sendMessage = new SendMessage();
             sendMessage.setChatId(String.valueOf(user2.getId()));
             sendMessage.setText(message.getText());
 
@@ -105,9 +114,12 @@ public class AdminController extends Thread {
 
             Main.MY_TELEGRAM_BOT.sendMsg(sendMessage1);
 
+        } else if (user.getStatus().equals(Status.ADMIN_CREATE_CATEGORY)) {
+
+            AdminService adminService = new AdminService(message, user);
+            adminService.createCategory();
+
         }
-
-
     }
 
     public void workCallbackQuery(CallbackQuery callbackQuery) {
@@ -169,6 +181,31 @@ public class AdminController extends Thread {
             AdminService adminService = new AdminService(message, user);
             adminService.customerBlockedOrUnblocked(data);
 
+        } else if (user.getStatus().equals(Status.ADMIN_CUSTOMER_CRUD) && data.startsWith("CP/")) {
+
+            AdminService adminService = new AdminService(message, user);
+            adminService.customerProduct(data);
+
+        } else if (user.getStatus().equals(Status.CATEGORY_CRUD)) {
+
+            CategoryService categoryService = new CategoryService(message, user);
+            categoryService.crudCallback(data);
+
+        } else if (user.getStatus().equals(Status.ADMIN_CREATE_CATEGORY)) {
+
+            AdminService adminService = new AdminService(message, user);
+            adminService.createCategory(data);
+
+
+        } else if (user.getStatus().equals(Status.ADMIN_UPDATE_CATEGORY)) {
+
+            AdminService adminService = new AdminService(message, user);
+            adminService.updatecategory(data);
+
+        } else if (user.getStatus().equals(Status.ADMIN_DELETED_CATEGORY)) {
+
+            AdminService adminService = new AdminService(message, user);
+            adminService.deletedCategory(data);
         }
     }
 }

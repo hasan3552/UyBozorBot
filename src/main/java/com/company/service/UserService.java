@@ -97,6 +97,12 @@ public class UserService extends Thread {
         sendMessage.setReplyMarkup(categoryMenuForUser);
 
         Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
+
+
+        DeleteMessage deleteMessage = new DeleteMessage();
+        deleteMessage.setChatId(String.valueOf(message.getChatId()));
+        deleteMessage.setMessageId(message.getMessageId());
+        Main.MY_TELEGRAM_BOT.sendMsg(deleteMessage);
     }
 
     public void setting() {
@@ -628,6 +634,34 @@ public class UserService extends Thread {
         deleteMessage.setChatId(String.valueOf(message.getChatId()));
         deleteMessage.setMessageId(message.getMessageId());
         Main.MY_TELEGRAM_BOT.sendMsg(deleteMessage);
+
+    }
+
+    public void blockedUser() {
+
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(String.valueOf(user.getId()));
+        sendMessage.setText(language.equals(Language.UZ) ? "Murojaatingiz yuborildi. Tez orada javob qaytaramiz." :
+                "Ваш запрос был отправлен. Мы ответим в ближайшее время.");
+        sendMessage.setReplyMarkup(KeyboardUtil.getContactAdmin());
+
+        Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
+
+        User user1 = Database.customers.stream()
+                .filter(user2 -> user2.getRole().equals(Role.SUPER_ADMIN))
+                .findAny().get();
+
+
+        SendMessage sendMessage1 = new SendMessage();
+        sendMessage1.setChatId(String.valueOf(user1.getId()));
+        sendMessage1.setText("<b>FROM BLOCKED CUSTOMER :" + user.getId() + "</b>\n\n" + message.getText());
+        sendMessage1.setParseMode(ParseMode.HTML);
+
+        InlineKeyboardMarkup blockedUserResponse = KeyboardUtil.getBlockedUserResponse(user.getId());
+        sendMessage1.setReplyMarkup(blockedUserResponse);
+
+        Main.MY_TELEGRAM_BOT.sendMsg(sendMessage1);
 
     }
 }

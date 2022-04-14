@@ -552,7 +552,7 @@ public class KeyboardUtil {
         InlineKeyboardButton button3 = new InlineKeyboardButton();
         button3.setText(language.equals(Language.UZ) ?
                 "\uD83D\uDDD1 Kategoriya o'chirish." : "\uD83D\uDDD1 Удалить категорию.");
-        button3.setCallbackData(DemoUtil.CATEGORY_UPDATE);
+        button3.setCallbackData(DemoUtil.CATEGORY_DELETED);
         row3.add(button3);
         rowList.add(row3);
 
@@ -586,7 +586,7 @@ public class KeyboardUtil {
         InlineKeyboardButton button1 = new InlineKeyboardButton();
         button1.setText(language.equals(Language.UZ) ? " \uD83D\uDD0E Mijozning e'lonlari "
                 : " \uD83D\uDD0E Объявления клиентов ");
-        button1.setCallbackData("Elon/" + (customer.getId())+"/0");
+        button1.setCallbackData("CP/" + (customer.getId()) + "/0");
         row1.add(button1);
         rowList.add(row1);
 
@@ -659,12 +659,52 @@ public class KeyboardUtil {
         List<InlineKeyboardButton> row = new ArrayList<>();
         InlineKeyboardButton button = new InlineKeyboardButton();
         button.setText("✏️ RESPONSE");
-        button.setCallbackData("RESPONSE/"+userId);
+        button.setCallbackData("RESPONSE/" + userId);
         row.add(button);
 
         rowList.add(row);
         markup.setKeyboard(rowList);
 
+        return markup;
+
+    }
+
+    public static InlineKeyboardMarkup getUserProducts
+            (int step, Language language, long customerId, int productSize) {
+
+
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
+
+        List<InlineKeyboardButton> row = new ArrayList<>();
+
+        if (step != 0) {
+
+            InlineKeyboardButton button = new InlineKeyboardButton();
+            button.setText("⏪");
+            button.setCallbackData("CP/" + (customerId) + "/" + (step - 1));
+            row.add(button);
+
+        }
+
+        if (step + 1 < productSize) {
+
+            InlineKeyboardButton button1 = new InlineKeyboardButton();
+            button1.setText("⏩");
+            button1.setCallbackData("CP/" + (customerId) + "/" + (step + 1));
+            row.add(button1);
+
+        }
+        rowList.add(row);
+
+        List<InlineKeyboardButton> row2 = new ArrayList<>();
+        InlineKeyboardButton button2 = new InlineKeyboardButton();
+        button2.setText(language.equals(Language.UZ) ? "\uD83D\uDD1A Chiqish" : "\uD83D\uDD1A Выход");
+        button2.setCallbackData(DemoUtil.BACK);
+        row2.add(button2);
+        rowList.add(row2);
+
+        markup.setKeyboard(rowList);
         return markup;
 
     }

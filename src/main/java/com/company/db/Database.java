@@ -16,6 +16,7 @@ public class Database {
     public static List<Status> statuses=  new ArrayList<>();
     public static List<ProductStatus> productStatuses = new ArrayList<>();
     public static List<AdStatus> adStatuses = new ArrayList<>();
+    public static List<CategoryStatus> categoryStatuses = new ArrayList<>();
 
     public static List<User> customers = new ArrayList<>();
     public static List<Category> categories = new ArrayList<>();
@@ -58,6 +59,10 @@ public class Database {
         adStatuses.add(AdStatus.HAS_URL);
         adStatuses.add(AdStatus.HAS_INLINE_NAME);
         adStatuses.add(AdStatus.READY);
+
+        categoryStatuses.add(CategoryStatus.NEW);
+        categoryStatuses.add(CategoryStatus.HAS_NAME_RU);
+        categoryStatuses.add(CategoryStatus.HAS_NAME_UZ);
     }
 
 }

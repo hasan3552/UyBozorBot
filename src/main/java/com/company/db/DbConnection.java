@@ -1,10 +1,7 @@
 package com.company.db;
 
 
-import com.company.enums.Language;
-import com.company.enums.ProductStatus;
-import com.company.enums.Role;
-import com.company.enums.Status;
+import com.company.enums.*;
 import com.company.model.*;
 
 import java.sql.*;
@@ -72,8 +69,12 @@ public class DbConnection {
                 String nameRu = resultSet2.getString("name_ru");
                 Integer categoryId = resultSet2.getInt("category_id");
                 Boolean isDeleted = resultSet2.getBoolean("is_deleted");
+                String status = resultSet2.getString("status");
+                CategoryStatus categoryStatus1 = Database.categoryStatuses.stream()
+                        .filter(categoryStatus -> categoryStatus.name().equals(status))
+                        .findAny().get();
 
-                Category category = new Category(id, nameUz, nameRu, categoryId, isDeleted);
+                Category category = new Category(id, nameUz, nameRu, categoryId, isDeleted,categoryStatus1);
                 Database.categories.add(category);
 
             }
