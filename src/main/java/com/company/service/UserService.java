@@ -1,13 +1,12 @@
 package com.company.service;
 
 import com.company.Main;
-import com.company.controller.BotControl;
 import com.company.db.Database;
+import com.company.db.DbConnection;
 import com.company.enums.Language;
 import com.company.enums.Role;
 import com.company.enums.Status;
 import com.company.model.*;
-import com.company.util.DemoUtil;
 import com.company.util.KeyboardUtil;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendContact;
@@ -18,13 +17,11 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.PhotoSize;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ForceReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Pattern;
 
 public class UserService extends Thread {
@@ -50,7 +47,10 @@ public class UserService extends Thread {
         if (message.hasContact() && user.getStatus().equals(Status.GIVE_CONTACT)) {
 
             user.setStatus(Status.GIVE_LANGUAGE);
+            DbConnection.setStatusUser(user.getId(), user.getStatus());
+
             user.setPhoneNumber(message.getContact().getPhoneNumber());
+            DbConnection.setUserPhoneNumber(user.getId(), user.getPhoneNumber());
 
             SendMessage sendMessage = new SendMessage();
             sendMessage.setChatId(String.valueOf(user.getId()));
@@ -64,8 +64,13 @@ public class UserService extends Thread {
         } else if (user.getStatus().equals(Status.GIVE_FULL_NAME) && message.hasText()) {
 
             user.setStatus(Status.MENU);
+            DbConnection.setStatusUser(user.getId(), user.getStatus());
+
             user.setRole(Role.CUSTOMER);
+            DbConnection.setRoleUser(user.getId(), user.getRole());
+
             user.setFullName(message.getText());
+            DbConnection.setUserFullName(user.getId(), user.getFullName());
 
             SendMessage sendMessage = new SendMessage();
             sendMessage.setChatId(String.valueOf(user.getId()));
@@ -107,6 +112,7 @@ public class UserService extends Thread {
 
     public void setting() {
         user.setStatus(Status.USER_SETTING_MENU);
+        DbConnection.setStatusUser(user.getId(), user.getStatus());
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(String.valueOf(user.getId()));
@@ -146,6 +152,7 @@ public class UserService extends Thread {
 
         if (!products.isEmpty()) {
             user.setStatus(Status.USER_SHOW_LIKED);
+            DbConnection.setStatusUser(user.getId(), user.getStatus());
 
             SendPhoto sendPhoto = new SendPhoto();
             sendPhoto.setChatId(String.valueOf(user.getId()));
@@ -225,7 +232,6 @@ public class UserService extends Thread {
             deleteMessage.setMessageId(message.getMessageId());
             Main.MY_TELEGRAM_BOT.sendMsg(deleteMessage);
 
-
         } else if (data.startsWith("D/")) {
 
             System.out.println(data);
@@ -236,10 +242,13 @@ public class UserService extends Thread {
             List<Product> products1 = userService.myLikedProduct();
             Long id = products1.get(productId).getId();
 
-            Database.likeds.stream()
+            Liked liked1 = Database.likeds.stream()
                     .filter(liked -> liked.getUserId() == (long) user.getId() &&
                             liked.getProductId() == (long) id && !liked.getIsDeleted())
-                    .findAny().get().setIsDeleted(true);
+                    .findAny().get();
+
+            liked1.setIsDeleted(true);
+            DbConnection.setLikedPotho(liked1.getId(),liked1.getIsDeleted());
 
             if (products1.size() > 1) {
 
@@ -264,6 +273,7 @@ public class UserService extends Thread {
                 Main.MY_TELEGRAM_BOT.sendMsg(deleteMessage);
             } else {
                 user.setStatus(Status.MENU);
+                DbConnection.setStatusUser(user.getId(), user.getStatus());
 
                 SendMessage sendMessage = new SendMessage();
                 sendMessage.setChatId(String.valueOf(user.getId()));
@@ -288,6 +298,8 @@ public class UserService extends Thread {
         if (message.hasPhoto()) {
 
             user.setStatus(Status.USER_SEND_PRODUCT_CONTACT);
+            DbConnection.setStatusUser(user.getId(), user.getStatus());
+
             Product product1 = Database.products.stream()
                     .filter(product -> product.getUserId() == (long) user.getId() &&
                             !product.getIsSending() && product.getFileId() == null)
@@ -298,6 +310,7 @@ public class UserService extends Thread {
             String fileId = photo.get(photo.size() - 1).getFileId();
 
             product1.setFileId(fileId);
+            DbConnection.setProductPotho(product1.getId(),product1.getFileId());
 
             sendMessage.setText(language.equals(Language.UZ) ? "Iltimos mijozlar bo'g'lanishi uchun telefon raqam" +
                     " jo'nating. Telefon raqam o'zbekiston hududida ishlashi shart." : "Пожалуйста, пришлите номер " +
@@ -319,6 +332,7 @@ public class UserService extends Thread {
 
         if (message.hasContact()) {
             user.setStatus(Status.USER_SEND_PRODUCT_LOCATION);
+            DbConnection.setStatusUser(user.getId(), user.getStatus());
 
             Product product1 = Database.products.stream()
                     .filter(product -> !product.getIsSending() && product.getUserId() == (long) user.getId() &&
@@ -326,6 +340,7 @@ public class UserService extends Thread {
                     .findAny().get();
 
             product1.setContactProduct(message.getContact().getPhoneNumber());
+            DbConnection.setProductPhoneNumber(product1.getId(),product1.getContactProduct());
 
             sendMessage.setText(language.equals(Language.UZ) ? "Ko'chmas mulkning joylashuvini jo'nating." :
                     "Сообщите местонахождение объекта.");
@@ -334,7 +349,7 @@ public class UserService extends Thread {
         } else if (Pattern.matches("[+]998[0-9]{9}", message.getText()) ||
                 Pattern.matches("[0-9]{9}", message.getText())) {
             user.setStatus(Status.USER_SEND_PRODUCT_LOCATION);
-
+            DbConnection.setStatusUser(user.getId(), user.getStatus());
 
             Product product1 = Database.products.stream()
                     .filter(product -> !product.getIsSending() && product.getUserId() == (long) user.getId() &&
@@ -343,6 +358,7 @@ public class UserService extends Thread {
 
             product1.setContactProduct(message.getText().contains("+") ? message.getText().substring(1) :
                     "998" + message.getText());
+            DbConnection.setProductPhoneNumber(product1.getId(),product1.getContactProduct());
 
             sendMessage.setText(language.equals(Language.UZ) ? "Ko'chmas mulkning joylashuvini jo'nating." :
                     "Сообщите местонахождение объекта.");
@@ -362,7 +378,7 @@ public class UserService extends Thread {
 
         if (message.hasLocation()) {
             user.setStatus(Status.USER_SEND_PRODUCT_INFO);
-
+            DbConnection.setStatusUser(user.getId(), user.getStatus());
 
             Product product1 = Database.products.stream()
                     .filter(product -> !product.getIsSending() && product.getUserId() == (long) user.getId() &&
@@ -372,8 +388,10 @@ public class UserService extends Thread {
             org.telegram.telegrambots.meta.api.objects.Location location1 = message.getLocation();
             Location location = new Location(location1.getLongitude(), location1.getLatitude());
             Database.locations.add(location);
+            DbConnection.addLocatsion(location);
 
             product1.setLocationId(location.getId());
+            DbConnection.setProductLocation(product1.getId(), location.getId());
 
             sendMessage.setText(language.equals(Language.UZ) ?
                     "Ko'chmas mulk haqida to'liq ma'lumot kiriting. E'loningiz uchun eng muhim parametr hisoblanadi."
@@ -398,9 +416,13 @@ public class UserService extends Thread {
             if (user.getRole().equals(Role.CUSTOMER)) {
 
                 user.setStatus(Status.MENU);
+                DbConnection.setStatusUser(user.getId(), user.getStatus());
+
             } else {
 
                 user.setStatus(Status.ADMIN_MENU);
+                DbConnection.setStatusUser(user.getId(), user.getStatus());
+
             }
 
             Product product1 = Database.products.stream()
@@ -409,6 +431,7 @@ public class UserService extends Thread {
                     .findAny().get();
 
             product1.setText(message.getText());
+            DbConnection.setProductText(product1.getId(), product1.getText());
 
             sendMessage.setText(language.equals(Language.UZ) ?
                     "E'loningiz qabul qilindi. Adminlarimiz ko'rib chiqib 1-3 kun ichida e'lon joylashtiriladi." :
@@ -490,8 +513,10 @@ public class UserService extends Thread {
 
             Product product = new Product(user.getId(), categoryId);
             Database.products.add(product);
+            DbConnection.addProduct(product);
 
             user.setStatus(Status.USER_SEND_PRODUCT_PHOTO);
+            DbConnection.setStatusUser(user.getId(), user.getStatus());
 
             SendMessage sendMessage = new SendMessage();
             sendMessage.setChatId(String.valueOf(user.getId()));
@@ -547,9 +572,11 @@ public class UserService extends Thread {
             long userId = Long.parseLong(split[1]);
             long productId = Long.parseLong(split[2]);
 
-            Database.products.stream()
+            Product product1 = Database.products.stream()
                     .filter(product -> product.getId() == productId)
-                    .findAny().get().setIsDeleted(true);
+                    .findAny().get();
+            product1.setIsDeleted(true);
+            DbConnection.setProductDeleted(product1.getId(), product1.getIsDeleted());
 
             List<Product> products = Database.products.stream()
                     .filter(product -> product.getUserId() == (long) user.getId() && product.getIsSending() &&
@@ -584,6 +611,7 @@ public class UserService extends Thread {
 
         if (user.getRole().equals(Role.ADMIN)) {
             user.setStatus(Status.ADMIN_MENU);
+            DbConnection.setStatusUser(user.getId(), user.getStatus());
 
             SendMessage sendMessage = new SendMessage();
             sendMessage.setChatId(String.valueOf(user.getId()));
@@ -596,6 +624,7 @@ public class UserService extends Thread {
             Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
         } else {
             user.setStatus(Status.MENU);
+            DbConnection.setStatusUser(user.getId(), user.getStatus());
 
             SendMessage sendMessage = new SendMessage();
             sendMessage.setChatId(String.valueOf(user.getId()));
@@ -613,6 +642,8 @@ public class UserService extends Thread {
     public void myReklama() {
 
         user.setStatus(Status.USER_SHOW_OWN_PRODUCT);
+        DbConnection.setStatusUser(user.getId(), user.getStatus());
+
         SendPhoto sendPhoto = new SendPhoto();
         sendPhoto.setChatId(String.valueOf(user.getId()));
 
@@ -638,7 +669,6 @@ public class UserService extends Thread {
     }
 
     public void blockedUser() {
-
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(String.valueOf(user.getId()));

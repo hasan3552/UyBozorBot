@@ -2,6 +2,7 @@ package com.company.service;
 
 import com.company.Main;
 import com.company.db.Database;
+import com.company.db.DbConnection;
 import com.company.enums.AdStatus;
 import com.company.enums.Language;
 import com.company.enums.Role;
@@ -71,8 +72,10 @@ public class AdvertisementService extends Thread {
 
             List<PhotoSize> photo = message.getPhoto();
             String fileId = photo.get(photo.size() - 1).getFileId();
+
             advertisement1.setPhoto(fileId);
             advertisement1.setStatus(AdStatus.HAS_PHOTO);
+            DbConnection.setAdvertisementPhoto(advertisement1);
 
             SendMessage sendMessage = new SendMessage();
             sendMessage.setChatId(String.valueOf(user.getId()));
@@ -85,6 +88,7 @@ public class AdvertisementService extends Thread {
 
             advertisement1.setBody(message.getText());
             advertisement1.setStatus(AdStatus.HAS_CAPTION);
+            DbConnection.setAdvertisementBody(advertisement1);
 
             SendMessage sendMessage = new SendMessage();
             sendMessage.setChatId(String.valueOf(user.getId()));
@@ -96,6 +100,7 @@ public class AdvertisementService extends Thread {
 
             advertisement1.setStatus(AdStatus.HAS_INLINE_NAME);
             advertisement1.setInlineName(message.getText());
+            DbConnection.setAdvertisementInlineName(advertisement1);
 
             SendMessage sendMessage = new SendMessage();
             sendMessage.setChatId(String.valueOf(user.getId()));
@@ -107,8 +112,10 @@ public class AdvertisementService extends Thread {
         } else if (advertisement1.getStatus().equals(AdStatus.HAS_INLINE_NAME)) {
 
             if (message.getText().startsWith("http")) {
+
                 advertisement1.setStatus(AdStatus.READY);
                 advertisement1.setInlineUrl(message.getText());
+                DbConnection.setAdvertisementInlineUrl(advertisement1);
 
                 SendPhoto sendPhoto=  new SendPhoto();
                 sendPhoto.setChatId(String.valueOf(user.getId()));

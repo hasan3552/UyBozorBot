@@ -2,6 +2,7 @@ package com.company.service;
 
 import com.company.Main;
 import com.company.db.Database;
+import com.company.db.DbConnection;
 import com.company.enums.Language;
 import com.company.enums.Status;
 import com.company.model.*;
@@ -62,16 +63,6 @@ public class CategoryService extends Thread {
 
                 Main.MY_TELEGRAM_BOT.sendMsg(sendPhoto);
 
-//                EditMessageMedia editMessageMedia = new EditMessageMedia();
-//                editMessageMedia.setChatId(String.valueOf(user.getId()));
-//                editMessageMedia.setMessageId(message.getMessageId());
-//                editMessageMedia.setReplyMarkup(productMarkup);
-//
-//                InputMedia inputMedia = new InputMediaPhoto(products.get((int) productId).getFileId());
-//                inputMedia.setCaption(products.get((int) productId).getText());
-//                editMessageMedia.setMedia(inputMedia);
-//
-//                Main.MY_TELEGRAM_BOT.sendMsg(editMessageMedia);
                 DeleteMessage deleteMessage = new DeleteMessage();
                 deleteMessage.setChatId(String.valueOf(message.getChatId()));
                 deleteMessage.setMessageId(message.getMessageId());
@@ -79,6 +70,7 @@ public class CategoryService extends Thread {
 
             } else {
                 user.setStatus(Status.MENU);
+                DbConnection.setStatusUser(user.getId(),user.getStatus());
 
                 SendMessage sendMessage = new SendMessage();
                 sendMessage.setChatId(String.valueOf(user.getId()));
@@ -99,7 +91,6 @@ public class CategoryService extends Thread {
             SendLocation sendLocation = new SendLocation();
             sendLocation.setChatId(String.valueOf(user.getId()));
 
-            //String loc = data.replace("Loc", "");
             String[] split = data.split("/");
             int productId = Integer.parseInt(split[1]);
 
@@ -112,7 +103,6 @@ public class CategoryService extends Thread {
             Location location1 = Database.locations.stream()
                     .filter(location -> location.getId() == (long) locationId)
                     .findAny().get();
-
 
             sendLocation.setLatitude(location1.getLate());
             sendLocation.setLongitude(location1.getLang());
@@ -151,11 +141,14 @@ public class CategoryService extends Thread {
             sendMessage.setChatId(String.valueOf(user.getId()));
 
             Liked liked = new Liked((long) Database.likeds.size() + 1, Long.parseLong(userId), Long.parseLong(productId), false);
+
             if (Database.likeds.stream()
                     .noneMatch(liked1 -> liked1.getUserId() == (long) liked.getUserId() &&
                             liked1.getProductId() == (long) liked.getProductId() && !liked1.getIsDeleted())) {
+
                 Database.likeds.add(liked);
-                System.out.println("liked = " + liked);
+                DbConnection.addLikedProduct(liked);
+
                 sendMessage.setText(language.equals(Language.UZ) ?
                         "Saralanganlar ro'yhatiga qo'shildi." : "Добавил в шорт-лист.");
 
@@ -170,6 +163,7 @@ public class CategoryService extends Thread {
 
     public void crud() {
         user.setStatus(Status.CATEGORY_CRUD);
+        DbConnection.setStatusUser(user.getId(), user.getStatus());
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(String.valueOf(user.getId()));
@@ -179,7 +173,6 @@ public class CategoryService extends Thread {
         sendMessage.setReplyMarkup(categoryCRUD);
 
         Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
-
 
         DeleteMessage deleteMessage = new DeleteMessage();
         deleteMessage.setChatId(String.valueOf(message.getChatId()));
@@ -192,6 +185,7 @@ public class CategoryService extends Thread {
 
         if (data.equals(DemoUtil.CATEGORY_CREATE)) {
             user.setStatus(Status.ADMIN_CREATE_CATEGORY);
+            DbConnection.setStatusUser(user.getId(), user.getStatus());
 
             InlineKeyboardMarkup mainCategory = KeyboardUtil.getMainCategory(language);
 
@@ -205,6 +199,7 @@ public class CategoryService extends Thread {
 
         } else if (data.equals(DemoUtil.CATEGORY_SHOW)) {
             user.setStatus(Status.CATEGORY_CRUD);
+            DbConnection.setStatusUser(user.getId(), user.getStatus());
 
             String cateUz = "";
             String cateRu = "";
@@ -227,6 +222,7 @@ public class CategoryService extends Thread {
         } else if (data.equals(DemoUtil.CATEGORY_UPDATE)) {
 
             user.setStatus(Status.ADMIN_UPDATE_CATEGORY);
+            DbConnection.setStatusUser(user.getId(), user.getStatus());
 
             InlineKeyboardMarkup mainCategory = KeyboardUtil.getMainCategory(language);
 
@@ -241,6 +237,7 @@ public class CategoryService extends Thread {
         } else if (data.equals(DemoUtil.CATEGORY_DELETED)) {
 
             user.setStatus(Status.ADMIN_DELETED_CATEGORY);
+            DbConnection.setStatusUser(user.getId(), user.getStatus());
 
             InlineKeyboardMarkup mainCategory = KeyboardUtil.getMainCategory(language);
 

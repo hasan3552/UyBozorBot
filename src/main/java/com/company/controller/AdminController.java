@@ -2,6 +2,7 @@ package com.company.controller;
 
 import com.company.Main;
 import com.company.db.Database;
+import com.company.db.DbConnection;
 import com.company.enums.CategoryStatus;
 import com.company.enums.Language;
 import com.company.enums.Status;
@@ -101,6 +102,10 @@ public class AdminController extends Thread {
             user2.setStatus(Status.USER_SHOW_LIKED);
             user.setStatus(Status.ADMIN_MENU);
 
+            DbConnection.setStatusUser(user2.getId(), user2.getStatus());
+            DbConnection.setStatusUser(user.getId(), user.getStatus());
+
+
             SendMessage sendMessage = new SendMessage();
             sendMessage.setChatId(String.valueOf(user2.getId()));
             sendMessage.setText(message.getText());
@@ -134,6 +139,7 @@ public class AdminController extends Thread {
         } else if (data.equals(DemoUtil.BACK)) {
 
             user.setStatus(Status.ADMIN_MENU);
+            DbConnection.setStatusUser(user.getId(), user.getStatus());
 
             DeleteMessage deleteMessage = new DeleteMessage();
             deleteMessage.setChatId(String.valueOf(message.getChatId()));

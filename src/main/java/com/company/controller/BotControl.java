@@ -1,6 +1,7 @@
 package com.company.controller;
 
 import com.company.db.Database;
+import com.company.db.DbConnection;
 import com.company.enums.Role;
 import com.company.model.User;
 import com.company.service.BotService;
@@ -63,7 +64,7 @@ public class BotControl extends TelegramLongPollingBot {
                 User user = new User(message.getChatId(), message.getFrom().getUserName());
 
                 Database.customers.add(user);
-                // DbConnection.addCustomer(user);
+                DbConnection.addCustomer(user);
 
                 BotService botService = new BotService(message, user);
                 botService.start();
@@ -114,15 +115,6 @@ public class BotControl extends TelegramLongPollingBot {
 
         try {
             execute(sendPhoto);
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void sendMsg(EditMessageMedia editMessageMedia) {
-
-        try {
-            execute(editMessageMedia);
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }

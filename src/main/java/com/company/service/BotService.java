@@ -1,6 +1,7 @@
 package com.company.service;
 
 import com.company.Main;
+import com.company.db.DbConnection;
 import com.company.enums.Language;
 import com.company.enums.Status;
 import com.company.model.User;
@@ -51,7 +52,10 @@ public class BotService extends Thread{
                 (data.equals(DemoUtil.LANG_UZ) || data.equals(DemoUtil.LANG_RU))){
 
             user.setLanguage(data.equals(DemoUtil.LANG_RU) ? Language.RU : Language.UZ);
+            DbConnection.setLanguageUser(user.getId(),user.getLanguage());
+
             user.setStatus(Status.GIVE_FULL_NAME);
+            DbConnection.setStatusUser(user.getId(), user.getStatus());
 
             SendMessage sendMessage = new SendMessage();
             sendMessage.setChatId(String.valueOf(user.getId()));

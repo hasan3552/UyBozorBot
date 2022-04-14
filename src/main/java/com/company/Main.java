@@ -17,8 +17,8 @@ public class Main {
 
             Main.MY_TELEGRAM_BOT = new BotControl();
             Database.compile();
-            headerMethod();
             DbConnection.readFromDatabase();
+            headerMethod();
 
         } catch (Exception e) {
             e.printStackTrace();

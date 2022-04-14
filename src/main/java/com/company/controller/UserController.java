@@ -2,6 +2,7 @@ package com.company.controller;
 
 import com.company.Main;
 import com.company.db.Database;
+import com.company.db.DbConnection;
 import com.company.enums.Language;
 import com.company.enums.Role;
 import com.company.enums.Status;
@@ -34,7 +35,7 @@ public class UserController extends Thread {
     @Override
     public void run() {
 
-        System.out.println("user.getStatus() = " + user.getStatus());
+        //System.out.println("user.getStatus() = " + user.getStatus());
         if (user.getStatus().equals(Status.MENU) &&
                 (message.getText().equals(DemoUtil.KVARTIRA_UZ) || message.getText().equals(DemoUtil.KVARTIRA_RU) ||
                         message.getText().equals(DemoUtil.FIELD_YARD_UZ) || message.getText().equals(DemoUtil.FIELD_YARD_RU) ||
@@ -42,6 +43,7 @@ public class UserController extends Thread {
                         message.getText().equals(DemoUtil.GROUND_UZ) || message.getText().equals(DemoUtil.GROUND_RU))) {
 
             user.setStatus(Status.USER_SHOW_CATEGORY);
+            DbConnection.setStatusUser(user.getId(), user.getStatus());
 
             Integer categoryId =
                     (message.getText().equals(DemoUtil.KVARTIRA_UZ) || message.getText().equals(DemoUtil.KVARTIRA_RU)) ? 1 :
@@ -63,8 +65,10 @@ public class UserController extends Thread {
             userService.setting();
 
         } else if (user.getStatus().equals(Status.MENU) && (message.getText().equals(DemoUtil.LIKED_UZ) || message.getText().equals(DemoUtil.LIKED_RU))) {
+
             UserService userService = new UserService(message, user);
             userService.showUserLiked();
+
         } else if (user.getStatus().equals(Status.USER_SETTING_MENU)) {
 
             SettingService settingService = new SettingService(message, user);
@@ -83,6 +87,8 @@ public class UserController extends Thread {
         } else if (user.getStatus().equals(Status.MENU) && (message.getText().equals(DemoUtil.GIVE_REKLAMA_UZ) || message.getText().equals(DemoUtil.GIVE_REKLAMA_RU))) {
 
             user.setStatus(Status.USER_GIVE_REKLAMA);
+            DbConnection.setStatusUser(user.getId(), user.getStatus());
+
             SendMessage sendMessage = new SendMessage();
             sendMessage.setChatId(String.valueOf(user.getId()));
             sendMessage.setText(language.equals(Language.UZ) ?
@@ -126,6 +132,7 @@ public class UserController extends Thread {
                 user.getIsBlocked() && (message.getText().equals("✏️ REQUEST"))){
 
             user.setStatus(Status.BLOCKED_USER);
+            DbConnection.setStatusUser(user.getId(), user.getStatus());
 
             SendMessage sendMessage = new SendMessage();
             sendMessage.setChatId(String.valueOf(user.getId()));
@@ -151,6 +158,7 @@ public class UserController extends Thread {
         if (data.equals(DemoUtil.BACK)) {
 
             user.setStatus(Status.MENU);
+            DbConnection.setStatusUser(user.getId(), user.getStatus());
 
             DeleteMessage deleteMessage = new DeleteMessage();
             deleteMessage.setChatId(String.valueOf(message.getChatId()));

@@ -2,6 +2,7 @@ package com.company.service;
 
 import com.company.Main;
 import com.company.db.Database;
+import com.company.db.DbConnection;
 import com.company.enums.*;
 import com.company.model.Advertisement;
 import com.company.model.Category;
@@ -19,7 +20,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 
-import javax.xml.crypto.Data;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,14 +49,17 @@ public class AdminService extends Thread {
             sendMessage.setReplyMarkup(adminMenu);
 
             Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
+
         } else if (message.getText().equals(DemoUtil.SETTING_UZ) || message.getText().equals(DemoUtil.SETTING_RU)) {
 
             UserService userService = new UserService(message, user);
             userService.setting();
+
         } else if (message.getText().equals(DemoUtil.GIVE_REKLAMA_UZ) ||
                 message.getText().equals(DemoUtil.GIVE_REKLAMA_RU)) {
 
             user.setStatus(Status.USER_GIVE_REKLAMA);
+            DbConnection.setStatusUser(user.getId(), user.getStatus());
 
             SendMessage sendMessage = new SendMessage();
             sendMessage.setChatId(String.valueOf(user.getId()));
@@ -90,6 +93,8 @@ public class AdminService extends Thread {
         } else if (message.getText().equals(DemoUtil.REKLAMA_GENERAL_UZ) || message.getText().equals(DemoUtil.REKLAMA_GENERAL_RU)) {
 
             user.setStatus(Status.PREMIUM_REKLAMA);
+            DbConnection.setStatusUser(user.getId(), user.getStatus());
+
             SendMessage sendMessage = new SendMessage();
             sendMessage.setChatId(String.valueOf(user.getId()));
             sendMessage.setText(language.equals(Language.UZ) ?
@@ -97,6 +102,7 @@ public class AdminService extends Thread {
 
             Advertisement advertisement = new Advertisement();
             Database.advertisements.add(advertisement);
+            DbConnection.addAdvertisement(advertisement);
 
             Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
 
@@ -110,6 +116,7 @@ public class AdminService extends Thread {
             if (user.getRole().equals(Role.SUPER_ADMIN)) {
 
                 user.setStatus(Status.ADMIN_CUSTOMER_CRUD);
+                DbConnection.setStatusUser(user.getId(), user.getStatus());
 
                 SendMessage sendMessage = new SendMessage();
                 sendMessage.setChatId(String.valueOf(user.getId()));
@@ -131,6 +138,7 @@ public class AdminService extends Thread {
 
     public void addAdmin() {
         user.setStatus(Status.ADMIN_ADD_OR_REVOKE_ADMIN);
+        DbConnection.setStatusUser(user.getId(), user.getStatus());
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(String.valueOf(user.getId()));
@@ -151,8 +159,10 @@ public class AdminService extends Thread {
                     .findAny().get();
 
             product1.setStatus(ProductStatus.BREAK);
+            DbConnection.setProductStatus(product1.getId(), product1.getStatus());
 
             user.setStatus(Status.ADMIN_MENU);
+            DbConnection.setStatusUser(user.getId(), user.getStatus());
 
             SendMessage sendMessage = new SendMessage();
             sendMessage.setChatId(String.valueOf(product1.getUserId()));
@@ -177,9 +187,12 @@ public class AdminService extends Thread {
         long userId = Long.parseLong(split[1]);
         long productId = Long.parseLong(split[2]);
 
-        Database.products.stream()
+        Product product1 = Database.products.stream()
                 .filter(product -> product.getId() == (long) productId)
-                .findAny().get().setIsSending(true);
+                .findAny().get();
+        product1.setIsSending(true);
+
+        DbConnection.setProductIsSending(product1.getId(), product1.getIsSending());
 
         Language language1 = Database.customers.stream()
                 .filter(user1 -> user1.getId() == userId)
@@ -213,9 +226,14 @@ public class AdminService extends Thread {
         if (role.equals(Role.CUSTOMER)) {
 
             user.setStatus(Status.ADMIN_SEND_CUSTOMER_RESPONSE);
-            Database.products.stream()
+            DbConnection.setStatusUser(user.getId(), user.getStatus());
+
+            Product product1 = Database.products.stream()
                     .filter(product -> product.getId() == productId)
-                    .findAny().get().setStatus(ProductStatus.REQUEST);
+                    .findAny().get();
+
+            product1.setStatus(ProductStatus.REQUEST);
+            DbConnection.setProductStatus(product1.getId(), product1.getStatus());
 
             SendMessage sendMessage = new SendMessage();
             sendMessage.setChatId(String.valueOf(user.getId()));
@@ -225,9 +243,12 @@ public class AdminService extends Thread {
 
         } else {
 
-            Database.products.stream()
+            Product product1 = Database.products.stream()
                     .filter(product -> product.getId() == productId)
-                    .findAny().get().setStatus(ProductStatus.BREAK);
+                    .findAny().get();
+
+            product1.setStatus(ProductStatus.BREAK);
+            DbConnection.setProductStatus(product1.getId(), product1.getStatus());
 
             SendMessage sendMessage = new SendMessage();
             sendMessage.setChatId(String.valueOf(user.getId()));
@@ -255,20 +276,28 @@ public class AdminService extends Thread {
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(String.valueOf(user.getId()));
+
         user.setStatus(Status.ADMIN_MENU);
+        DbConnection.setStatusUser(user.getId(), user.getStatus());
         user2.setStatus(Status.REFRESH);
+        DbConnection.setStatusUser(user2.getId(), user2.getStatus());
+
 
         if (user2.getRole().equals(Role.CUSTOMER)) {
 
             sendMessage.setText(language.equals(Language.UZ) ?
                     "Admin roli berildi." : "Была дана роль администратора.");
+
             user2.setRole(Role.ADMIN);
+            DbConnection.setRoleUser(user2.getId(), user.getRole());
 
         } else {
 
             sendMessage.setText(language.equals(Language.UZ) ?
                     "Adminlik roli olindi." : "Роль администратора взята на себя.");
+
             user2.setRole(Role.CUSTOMER);
+            DbConnection.setRoleUser(user2.getId(), user.getRole());
 
         }
 
@@ -335,12 +364,16 @@ public class AdminService extends Thread {
         sendMessage1.setText(language.equals(Language.UZ) ? user2.getIsBlocked() ?
                 " Foydalanuvchi blokdan yechildi." : "Foydalanuvchi bloklandi." : user2.getIsBlocked() ?
                 " Пользователь разблокирован." : " Пользователь заблокирован.");
+
         user.setStatus(Status.ADMIN_MENU);
+        DbConnection.setStatusUser(user.getId(), user.getStatus());
 
         Main.MY_TELEGRAM_BOT.sendMsg(sendMessage1);
 
         if (user2.getIsBlocked()) {
+
             user2.setIsBlocked(false);
+            DbConnection.setUserIsBlocked(user2.getId(), user2.getIsBlocked());
 
             SendMessage sendMessage = new SendMessage();
             sendMessage.setChatId(String.valueOf(userId));
@@ -348,16 +381,23 @@ public class AdminService extends Thread {
                     "Siz blokdan ochildingiz." : "Вы разблокировали блокировку.");
 
             if (user2.getRole().equals(Role.CUSTOMER)) {
+
                 sendMessage.setReplyMarkup(KeyboardUtil.getMenu(user2.getLanguage()));
                 user2.setStatus(Status.MENU);
+                DbConnection.setStatusUser(user2.getId(), user2.getStatus());
+
             } else {
+
                 sendMessage.setReplyMarkup(KeyboardUtil.getAdminMenu(user2.getLanguage()));
                 user2.setStatus(Status.ADMIN_MENU);
+                DbConnection.setStatusUser(user2.getId(), user2.getStatus());
+
             }
 
             Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
         } else {
             user2.setIsBlocked(true);
+            DbConnection.setUserIsBlocked(user2.getId(), user2.getIsBlocked());
 
             SendMessage sendMessage = new SendMessage();
             sendMessage.setChatId(String.valueOf(userId));
@@ -384,9 +424,12 @@ public class AdminService extends Thread {
         String[] split = data.split("/");
         long userId = Long.parseLong(split[1]);
 
-        Database.customers.stream()
+        User user2 = Database.customers.stream()
                 .filter(user1 -> user1.getId() == userId)
-                .findAny().get().setStatus(Status.WAIT_RESPONSE);
+                .findAny().get();
+
+        user2.setStatus(Status.WAIT_RESPONSE);
+        DbConnection.setStatusUser(user2.getId(), user2.getStatus());
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(String.valueOf(user.getId()));
@@ -395,9 +438,9 @@ public class AdminService extends Thread {
         sendMessage.setReplyMarkup(new ReplyKeyboardRemove(true));
 
         user.setStatus(Status.ADMIN_WRITE_RESPONSE);
+        DbConnection.setStatusUser(user.getId(), user.getStatus());
 
         Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
-
 
         DeleteMessage deleteMessage = new DeleteMessage();
         deleteMessage.setChatId(String.valueOf(message.getChatId()));
@@ -418,6 +461,8 @@ public class AdminService extends Thread {
             category.setNameUz(message.getText());
             category.setStatus(CategoryStatus.HAS_NAME_UZ);
 
+            DbConnection.setCategoryNameUz(category.getId(), category.getNameUz(), category.getStatus());
+
             SendMessage sendMessage = new SendMessage();
             sendMessage.setChatId(String.valueOf(user.getId()));
             sendMessage.setText(language.equals(Language.UZ) ?
@@ -436,7 +481,10 @@ public class AdminService extends Thread {
                 category.setStatus(CategoryStatus.HAS_NAME_RU);
                 category.setIsDeleted(false);
 
+                DbConnection.setCategoryNameRu(category.getId(), category.getNameRu(), category.getStatus(), category.getIsDeleted());
+
                 user.setStatus(Status.ADMIN_MENU);
+                DbConnection.setStatusUser(user.getId(), user.getStatus());
 
                 SendMessage sendMessage = new SendMessage();
                 sendMessage.setChatId(String.valueOf(user.getId()));
@@ -455,6 +503,7 @@ public class AdminService extends Thread {
 
         Category category = new Category(categoryId);
         Database.categories.add(category);
+        DbConnection.addCategory(category);
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(String.valueOf(user.getId()));
@@ -473,9 +522,6 @@ public class AdminService extends Thread {
 
 
         if (data.startsWith("ct/")) {
-
-            AdminService adminService = new AdminService(message, user);
-            adminService.updatecategory(data);
 
             String[] split = data.split("/");
             int categoryId = Integer.parseInt(split[1]);
@@ -508,7 +554,10 @@ public class AdminService extends Thread {
 
             category1.setIsDeleted(true);
             category1.setStatus(CategoryStatus.NEW);
+            DbConnection.setCategoryStatus(category1.getId(), category1.getStatus(), category1.getIsDeleted());
+
             user.setStatus(Status.ADMIN_CREATE_CATEGORY);
+            DbConnection.setStatusUser(user.getId(), user.getStatus());
 
             SendMessage sendMessage = new SendMessage();
             sendMessage.setChatId(String.valueOf(user.getId()));
@@ -527,9 +576,6 @@ public class AdminService extends Thread {
     public void deletedCategory(String data) {
 
         if (data.startsWith("ct/")) {
-
-            AdminService adminService = new AdminService(message, user);
-            adminService.deletedCategory(data);
 
             String[] split = data.split("/");
             int categoryId = Integer.parseInt(split[1]);
@@ -563,7 +609,10 @@ public class AdminService extends Thread {
                     .findAny().get();
 
             category1.setIsDeleted(true);
+            DbConnection.setCategoryStatus(category1.getId(), category1.getStatus(), category1.getIsDeleted());
+
             user.setStatus(Status.ADMIN_MENU);
+            DbConnection.setStatusUser(user.getId(), user.getStatus());
 
             SendMessage sendMessage = new SendMessage();
             sendMessage.setChatId(String.valueOf(user.getId()));
