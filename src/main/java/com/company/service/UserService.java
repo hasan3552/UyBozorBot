@@ -651,23 +651,36 @@ public class UserService extends Thread {
                 .filter(product -> product.getUserId() == (long) user.getId() && product.getIsSending() &&
                         !product.getIsDeleted()).toList();
 
-        InputFile inputFile = new InputFile(products.get(0).getFileId());
-        sendPhoto.setPhoto(inputFile);
+        if (!products.isEmpty()) {
 
-        InlineKeyboardMarkup showMyProduct =
-                KeyboardUtil.getShowMyProduct(user.getId(), language, 0, products);
-        sendPhoto.setReplyMarkup(showMyProduct);
-        sendPhoto.setCaption(products.get(0).getText());
+            InputFile inputFile = new InputFile(products.get(0).getFileId());
+            sendPhoto.setPhoto(inputFile);
 
-        Main.MY_TELEGRAM_BOT.sendMsg(sendPhoto);
+            InlineKeyboardMarkup showMyProduct =
+                    KeyboardUtil.getShowMyProduct(user.getId(), language, 0, products);
+            sendPhoto.setReplyMarkup(showMyProduct);
+            sendPhoto.setCaption(products.get(0).getText());
 
-        DeleteMessage deleteMessage = new DeleteMessage();
-        deleteMessage.setChatId(String.valueOf(message.getChatId()));
-        deleteMessage.setMessageId(message.getMessageId());
-        Main.MY_TELEGRAM_BOT.sendMsg(deleteMessage);
+            Main.MY_TELEGRAM_BOT.sendMsg(sendPhoto);
 
+            DeleteMessage deleteMessage = new DeleteMessage();
+            deleteMessage.setChatId(String.valueOf(message.getChatId()));
+            deleteMessage.setMessageId(message.getMessageId());
+            Main.MY_TELEGRAM_BOT.sendMsg(deleteMessage);
+
+        }else {
+            user.setStatus(Status.MENU);
+            DbConnection.setStatusUser(user.getId(), user.getStatus());
+
+            SendMessage sendMessage = new SendMessage();
+            sendMessage.setChatId(String.valueOf(user.getId()));
+            sendMessage.setText(language.equals(Language.UZ) ?
+                    "Sizning elonlar listingiz bo'sh. " : "Ваш список объявлений пуст.");
+
+            Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
+
+        }
     }
-
     public void blockedUser() {
 
         SendMessage sendMessage = new SendMessage();

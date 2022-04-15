@@ -184,6 +184,7 @@ public class CategoryService extends Thread {
     public void crudCallback(String data) {
 
         if (data.equals(DemoUtil.CATEGORY_CREATE)) {
+
             user.setStatus(Status.ADMIN_CREATE_CATEGORY);
             DbConnection.setStatusUser(user.getId(), user.getStatus());
 

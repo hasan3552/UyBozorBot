@@ -7,11 +7,10 @@ import com.company.model.*;
 import java.sql.*;
 import java.util.Optional;
 
+import static com.company.util.ComponentContainer.*;
+
 public class DbConnection {
 
-    public static final String DB_USERNAME = "postgres";
-    public static final String DB_PASSWORD = "hasan";
-    public static final String DB_URL = "jdbc:postgresql://localhost:5432/home_market";
     public static Connection connection;
 
     public static void readFromDatabase() {
@@ -49,7 +48,7 @@ public class DbConnection {
                         .findAny();
                 Language language1 = null;
                 if (optional1.isPresent()) {
-                   language1 =optional1.get();
+                    language1 = optional1.get();
                 }
 
                 String role = resultSet3.getString("role");
@@ -178,7 +177,7 @@ public class DbConnection {
             e.printStackTrace();
         }
 
-        String addUser =String.format("CALL add_users(%s,'%s')",user.getId(),user.getUsername());
+        String addUser = String.format("CALL add_users(%s,'%s')", user.getId(), user.getUsername());
 
         try (Statement statement = connection.createStatement()) {
 
@@ -198,7 +197,7 @@ public class DbConnection {
             e.printStackTrace();
         }
 
-        String setStatus = "UPDATE users SET status = '"+status.name() +"' WHERE id = "+id+";";
+        String setStatus = "UPDATE users SET status = '" + status.name() + "' WHERE id = " + id + ";";
 
         try (Statement statement = connection.createStatement()) {
 
@@ -219,7 +218,7 @@ public class DbConnection {
             e.printStackTrace();
         }
 
-        String setStatus = "UPDATE users SET language = '"+language.name() +"' WHERE id = "+id+";";
+        String setStatus = "UPDATE users SET language = '" + language.name() + "' WHERE id = " + id + ";";
 
         try (Statement statement = connection.createStatement()) {
 
@@ -239,7 +238,7 @@ public class DbConnection {
             e.printStackTrace();
         }
 
-        String setStatus = "UPDATE product SET status = '"+status.name() +"' WHERE id = "+id+";";
+        String setStatus = "UPDATE product SET status = '" + status.name() + "' WHERE id = " + id + ";";
 
         try (Statement statement = connection.createStatement()) {
 
@@ -259,7 +258,7 @@ public class DbConnection {
             e.printStackTrace();
         }
 
-        String addAdvertisement = "INSERT INTO advertisement (id) VALUES("+advertisement.getId()+")";
+        String addAdvertisement = "INSERT INTO advertisement (id) VALUES(" + advertisement.getId() + ")";
 
         try (Statement statement = connection.createStatement()) {
 
@@ -281,7 +280,7 @@ public class DbConnection {
             e.printStackTrace();
         }
 
-        String setStatus = "UPDATE product SET is_sending = "+isSending +" WHERE id = "+id+";";
+        String setStatus = "UPDATE product SET is_sending = " + isSending + " WHERE id = " + id + ";";
 
         try (Statement statement = connection.createStatement()) {
 
@@ -301,7 +300,7 @@ public class DbConnection {
             e.printStackTrace();
         }
 
-        String setStatus = "UPDATE users SET role = '"+role.name() +"' WHERE id = "+id+";";
+        String setStatus = "UPDATE users SET role = '" + role.name() + "' WHERE id = " + id + ";";
 
         try (Statement statement = connection.createStatement()) {
 
@@ -321,7 +320,7 @@ public class DbConnection {
             e.printStackTrace();
         }
 
-        String setStatus = "UPDATE users SET is_blocked = "+ isBlocked +" WHERE id = "+id+";";
+        String setStatus = "UPDATE users SET is_blocked = " + isBlocked + " WHERE id = " + id + ";";
 
         try (Statement statement = connection.createStatement()) {
 
@@ -342,8 +341,8 @@ public class DbConnection {
         }
 
         String setStatus = "UPDATE category " +
-                "SET name_uz = '"+ nameUz +"', status = '" +status+
-                "' WHERE id = "+id+";";
+                "SET name_uz = '" + nameUz + "', status = '" + status +
+                "' WHERE id = " + id + ";";
 
         try (Statement statement = connection.createStatement()) {
 
@@ -365,8 +364,8 @@ public class DbConnection {
         }
 
         String setStatus = "UPDATE category " +
-                "SET name_ru = '"+ nameRu +"', status = '" +status+"', is_deleted = "+isDeleted+
-                " WHERE id = "+id+";";
+                "SET name_ru = '" + nameRu + "', status = '" + status + "', is_deleted = " + isDeleted +
+                " WHERE id = " + id + ";";
 
         try (Statement statement = connection.createStatement()) {
 
@@ -386,8 +385,8 @@ public class DbConnection {
             e.printStackTrace();
         }
 
-        String addAdvertisement = "INSERT INTO category (id,status,category_id) " +
-                " VALUES("+category.getId()+", '"+category.getStatus()+"',"+category.getCategoryId()+")";
+        String addAdvertisement = "INSERT INTO category (id,status,category_id, status) " +
+                " VALUES(" + category.getId() + ", '" + category.getStatus() + "'," + category.getCategoryId() + ",'NEW')";
 
         try (Statement statement = connection.createStatement()) {
 
@@ -409,8 +408,8 @@ public class DbConnection {
         }
 
         String setStatus = "UPDATE category " +
-                "SET status = '"+ status +"',  is_deleted = "+isDeleted+
-                " WHERE id = "+id+";";
+                "SET status = '" + status + "',  is_deleted = " + isDeleted +
+                " WHERE id = " + id + ";";
 
         try (Statement statement = connection.createStatement()) {
 
@@ -432,8 +431,8 @@ public class DbConnection {
         }
 
         String setStatus = "UPDATE advertisement " +
-                "SET status = '"+ advertisement1.getStatus() +"',  photo = '"+advertisement1.getPhoto()+
-                "' WHERE id = "+advertisement1.getId()+";";
+                "SET status = '" + advertisement1.getStatus() + "',  photo = '" + advertisement1.getPhoto() +
+                "' WHERE id = " + advertisement1.getId() + ";";
 
         try (Statement statement = connection.createStatement()) {
 
@@ -448,7 +447,6 @@ public class DbConnection {
 
     public static void setAdvertisementBody(Advertisement advertisement1) {
 
-
         try {
             connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
         } catch (SQLException e) {
@@ -456,8 +454,8 @@ public class DbConnection {
         }
 
         String setStatus = "UPDATE advertisement " +
-                "SET status = '"+ advertisement1.getStatus() +"',  body = '"+advertisement1.getBody()+
-                "' WHERE id = "+advertisement1.getId()+";";
+                "SET status = '" + advertisement1.getStatus() + "',  body = '" + advertisement1.getBody() +
+                "' WHERE id = " + advertisement1.getId() + ";";
 
         try (Statement statement = connection.createStatement()) {
 
@@ -471,7 +469,6 @@ public class DbConnection {
 
     public static void setAdvertisementInlineName(Advertisement advertisement1) {
 
-
         try {
             connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
         } catch (SQLException e) {
@@ -479,8 +476,8 @@ public class DbConnection {
         }
 
         String setStatus = "UPDATE advertisement " +
-                "SET status = '"+ advertisement1.getStatus() +"',  inline_name = '"+advertisement1.getInlineName()+
-                "' WHERE id = "+advertisement1.getId()+";";
+                "SET status = '" + advertisement1.getStatus() + "',  inline_name = '" + advertisement1.getInlineName() +
+                "' WHERE id = " + advertisement1.getId() + ";";
 
         try (Statement statement = connection.createStatement()) {
 
@@ -502,8 +499,8 @@ public class DbConnection {
         }
 
         String setStatus = "UPDATE advertisement " +
-                "SET status = '"+ advertisement1.getStatus() +"',  inline_url = '"+advertisement1.getInlineUrl()+
-                "' WHERE id = "+advertisement1.getId()+";";
+                "SET status = '" + advertisement1.getStatus() + "',  inline_url = '" + advertisement1.getInlineUrl() +
+                "' WHERE id = " + advertisement1.getId() + ";";
 
         try (Statement statement = connection.createStatement()) {
 
@@ -524,7 +521,7 @@ public class DbConnection {
         }
 
         String addAdvertisement = "INSERT INTO liked (id,user_id,product_id) " +
-                " VALUES("+liked.getId()+", "+liked.getUserId()+","+liked.getProductId()+")";
+                " VALUES(" + liked.getId() + ", " + liked.getUserId() + "," + liked.getProductId() + ")";
 
         try (Statement statement = connection.createStatement()) {
 
@@ -534,8 +531,6 @@ public class DbConnection {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-
     }
 
     public static void setUserPhoneNumber(Long id, String phoneNumber) {
@@ -546,7 +541,7 @@ public class DbConnection {
             e.printStackTrace();
         }
 
-        String setStatus = "UPDATE users SET phone_number = '"+ phoneNumber +"' WHERE id = "+id+";";
+        String setStatus = "UPDATE users SET phone_number = '" + phoneNumber + "' WHERE id = " + id + ";";
 
         try (Statement statement = connection.createStatement()) {
 
@@ -566,7 +561,7 @@ public class DbConnection {
             e.printStackTrace();
         }
 
-        String setStatus = "UPDATE users SET fullname = '"+ fullName +"' WHERE id = "+id+";";
+        String setStatus = "UPDATE users SET fullname = '" + fullName + "' WHERE id = " + id + ";";
 
         try (Statement statement = connection.createStatement()) {
 
@@ -586,7 +581,7 @@ public class DbConnection {
             e.printStackTrace();
         }
 
-        String setStatus = "UPDATE users SET language = '"+ language.name() +"' WHERE id = "+id+";";
+        String setStatus = "UPDATE users SET language = '" + language.name() + "' WHERE id = " + id + ";";
 
         try (Statement statement = connection.createStatement()) {
 
@@ -607,7 +602,7 @@ public class DbConnection {
             e.printStackTrace();
         }
 
-        String setStatus = "UPDATE liked SET is_deleted = "+ isDeleted +" WHERE id = "+id+";";
+        String setStatus = "UPDATE liked SET is_deleted = " + isDeleted + " WHERE id = " + id + ";";
 
         try (Statement statement = connection.createStatement()) {
 
@@ -627,7 +622,7 @@ public class DbConnection {
             e.printStackTrace();
         }
 
-        String setStatus = "UPDATE product SET file_id = '"+ fileId +"' WHERE id = "+id+";";
+        String setStatus = "UPDATE product SET file_id = '" + fileId + "' WHERE id = " + id + ";";
 
         try (Statement statement = connection.createStatement()) {
 
@@ -648,7 +643,7 @@ public class DbConnection {
             e.printStackTrace();
         }
 
-        String setStatus = "UPDATE product SET contact_product = '"+ contactProduct +"' WHERE id = "+id+";";
+        String setStatus = "UPDATE product SET contact_product = '" + contactProduct + "' WHERE id = " + id + ";";
 
         try (Statement statement = connection.createStatement()) {
 
@@ -670,7 +665,7 @@ public class DbConnection {
         }
 
         String addAdvertisement = "INSERT INTO location (id,lang,late) " +
-                " VALUES("+location.getId()+", "+location.getLang()+","+location.getLate()+")";
+                " VALUES(" + location.getId() + ", " + location.getLang() + "," + location.getLate() + ")";
 
         try (Statement statement = connection.createStatement()) {
 
@@ -691,7 +686,7 @@ public class DbConnection {
             e.printStackTrace();
         }
 
-        String setStatus = "UPDATE product SET location_id = "+ id1 +" WHERE id = "+id+";";
+        String setStatus = "UPDATE product SET location_id = " + id1 + " WHERE id = " + id + ";";
 
         try (Statement statement = connection.createStatement()) {
 
@@ -712,7 +707,7 @@ public class DbConnection {
             e.printStackTrace();
         }
 
-        String setStatus = "UPDATE product SET text = '"+ text +"' WHERE id = "+id+";";
+        String setStatus = "UPDATE product SET text = '" + text + "' WHERE id = " + id + ";";
 
         try (Statement statement = connection.createStatement()) {
 
@@ -734,7 +729,7 @@ public class DbConnection {
         }
 
         String addAdvertisement = "INSERT INTO product (id,user_id,category_id, status) " +
-                " VALUES("+product.getId()+", "+product.getUserId()+","+product.getCategoryId()+",'NEW')";
+                " VALUES(" + product.getId() + ", " + product.getUserId() + "," + product.getCategoryId() + ",'NEW')";
 
         try (Statement statement = connection.createStatement()) {
 
@@ -754,7 +749,7 @@ public class DbConnection {
             e.printStackTrace();
         }
 
-        String setStatus = "UPDATE product SET is_deleted = "+ isDeleted +" WHERE id = "+id+";";
+        String setStatus = "UPDATE product SET is_deleted = " + isDeleted + " WHERE id = " + id + ";";
 
         try (Statement statement = connection.createStatement()) {
 

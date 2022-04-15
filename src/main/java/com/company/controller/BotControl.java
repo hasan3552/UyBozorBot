@@ -6,6 +6,7 @@ import com.company.enums.Role;
 import com.company.model.User;
 import com.company.service.BotService;
 import com.company.service.UserService;
+import com.company.util.ComponentContainer;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.*;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
@@ -18,17 +19,19 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.Optional;
 
+import static com.company.util.ComponentContainer.BOT_TOKEN;
+import static com.company.util.ComponentContainer.BOT_USERNAME;
+
 public class BotControl extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        return "bot_uybozorbot";
+        return BOT_USERNAME;
     }
 
     @Override
     public String getBotToken() {
-        return "5228556568:AAHfxqvgWFAgvoWziMghG6W3KqsztACZZRQ";
-
+        return BOT_TOKEN;
     }
 
     @Override
@@ -102,6 +105,7 @@ public class BotControl extends TelegramLongPollingBot {
             }
         }
     }
+
     public void sendMsg(SendLocation sendLocation) {
 
         try {
