@@ -59,9 +59,7 @@
     </dependencies>
 
     <build>
-
         <plugins>
-
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>appassembler-maven-plugin</artifactId>
@@ -75,12 +73,11 @@
                         </program>
                     </programs>
                 </configuration>
-
                 <executions>
                     <execution>
                         <phase>package</phase>
                         <goals>
-                            <goal>create-repository</goal>
+                            <goal>assemble</goal>
                         </goals>
                     </execution>
                 </executions>
