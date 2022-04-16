@@ -56,11 +56,12 @@
             <artifactId>lombok</artifactId>
             <version>1.18.16</version>
         </dependency>
-
     </dependencies>
 
     <build>
+
         <plugins>
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>appassembler-maven-plugin</artifactId>
@@ -79,7 +80,7 @@
                     <execution>
                         <phase>package</phase>
                         <goals>
-                            <goal>assemble</goal>
+                            <goal>create-repository</goal>
                         </goals>
                     </execution>
                 </executions>
