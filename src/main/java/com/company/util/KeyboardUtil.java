@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class KeyboardUtil {
 
@@ -327,7 +328,7 @@ public class KeyboardUtil {
 
         List<Category> categories = Database.categories.stream()
                 .filter(category -> category.getCategoryId() == 0 && !category.getIsDeleted())
-                .toList();
+                .collect(Collectors.toList());
 
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
@@ -427,7 +428,7 @@ public class KeyboardUtil {
 
         List<User> users = Database.customers.stream()
                 .filter(user -> !user.getRole().equals(Role.SUPER_ADMIN) && !user.getIsBlocked())
-                .toList();
+                .collect(Collectors.toList());
 
         //Collections.sort(users);
 
@@ -609,7 +610,7 @@ public class KeyboardUtil {
 
         List<User> customers = Database.customers.stream()
                 .filter(user -> user.getRole().equals(Role.CUSTOMER) || user.getRole().equals(Role.ADMIN))
-                .toList();
+                .collect(Collectors.toList());
 
         for (User customer : customers) {
 

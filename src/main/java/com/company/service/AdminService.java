@@ -22,6 +22,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRem
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class AdminService extends Thread {
 
@@ -528,7 +529,7 @@ public class AdminService extends Thread {
 
             List<Category> categories = Database.categories.stream()
                     .filter(category -> category.getCategoryId() == categoryId)
-                    .toList();
+                    .collect(Collectors.toList());
 
             InlineKeyboardMarkup categoryMenuForUser = KeyboardUtil.getCategoryMenuForUser(categories, language);
             SendMessage sendMessage = new SendMessage();
@@ -582,7 +583,7 @@ public class AdminService extends Thread {
 
             List<Category> categories = Database.categories.stream()
                     .filter(category -> category.getCategoryId() == categoryId)
-                    .toList();
+                    .collect(Collectors.toList());
 
             InlineKeyboardMarkup categoryMenuForUser = KeyboardUtil.getCategoryMenuForUser(categories, language);
 
@@ -637,7 +638,7 @@ public class AdminService extends Thread {
 
         List<Product> products = Database.products.stream()
                 .filter(product -> product.getUserId() == customerId)
-                .toList();
+                .collect(Collectors.toList());
 
         Product product = products.get(step);
 

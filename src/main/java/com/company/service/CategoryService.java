@@ -18,6 +18,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CategoryService extends Thread {
 
@@ -45,7 +46,7 @@ public class CategoryService extends Thread {
             List<Product> products = Database.products.stream()
                     .filter(product -> (product.getCategoryId() == categoryId) &&
                             !product.getIsDeleted() && product.getIsSending())
-                    .toList();
+                    .collect(Collectors.toList());
 
 
             if (!products.isEmpty()) {

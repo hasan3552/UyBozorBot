@@ -23,6 +23,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class UserService extends Thread {
 
@@ -84,14 +85,13 @@ public class UserService extends Thread {
             Main.MY_TELEGRAM_BOT.sendMsg(sendMessage);
 
         }
-
     }
 
     public void showCategoryToUser(Integer categoryId) {
 
         List<Category> categories = Database.categories.stream()
                 .filter(category -> category.getCategoryId() == (long) categoryId)
-                .toList();
+                .collect(Collectors.toList());
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(String.valueOf(user.getId()));
@@ -130,7 +130,7 @@ public class UserService extends Thread {
         List<Liked> likeds = Database.likeds.stream()
                 .filter(liked -> liked.getUserId() == (long) user.getId())
                 .filter(liked -> !liked.getIsDeleted())
-                .toList();
+                .collect(Collectors.toList());
 
         List<Product> productList = new ArrayList<>();
         for (Product product : Database.products) {
@@ -439,7 +439,7 @@ public class UserService extends Thread {
 
             List<User> admins = Database.customers.stream()
                     .filter(user1 -> user1.getRole().equals(Role.SUPER_ADMIN))
-                    .toList();
+                    .collect(Collectors.toList());
 
             for (User admin : admins) {
                 SendLocation sendLocation = new SendLocation();
@@ -488,7 +488,7 @@ public class UserService extends Thread {
 
             List<Category> categories = Database.categories.stream()
                     .filter(category -> category.getCategoryId() == categoryId && !category.getIsDeleted())
-                    .toList();
+                    .collect(Collectors.toList());
 
             SendMessage sendMessage = new SendMessage();
             sendMessage.setChatId(String.valueOf(user.getId()));
@@ -547,7 +547,7 @@ public class UserService extends Thread {
 
             List<Product> products = Database.products.stream()
                     .filter(product -> product.getUserId() == (long) user.getId() && product.getIsSending() &&
-                            !product.getIsDeleted()).toList();
+                            !product.getIsDeleted()).collect(Collectors.toList());
 
             Product product = products.get((int) productId);
 
@@ -580,7 +580,7 @@ public class UserService extends Thread {
 
             List<Product> products = Database.products.stream()
                     .filter(product -> product.getUserId() == (long) user.getId() && product.getIsSending() &&
-                            !product.getIsDeleted()).toList();
+                            !product.getIsDeleted()).collect(Collectors.toList());
 
             Product product = products.get(0);
 
@@ -649,7 +649,7 @@ public class UserService extends Thread {
 
         List<Product> products = Database.products.stream()
                 .filter(product -> product.getUserId() == (long) user.getId() && product.getIsSending() &&
-                        !product.getIsDeleted()).toList();
+                        !product.getIsDeleted()).collect(Collectors.toList());
 
         if (!products.isEmpty()) {
 

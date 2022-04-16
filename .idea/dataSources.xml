@@ -8,5 +8,12 @@
       <jdbc-url>jdbc:postgresql://localhost:5432/home_market</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="heroku" uuid="bd05eea1-dd91-495e-889e-13a91819485c">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://ec2-52-212-228-71.eu-west-1.compute.amazonaws.com:5432/dd2eqcd1m9tv8</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

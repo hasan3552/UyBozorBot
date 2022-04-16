@@ -17,6 +17,7 @@ import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class AdvertisementService extends Thread {
 
@@ -40,7 +41,7 @@ public class AdvertisementService extends Thread {
 
         List<User> users = Database.customers.stream()
                 .filter(user1 -> user1.getRole().equals(Role.CUSTOMER))
-                .toList();
+                .collect(Collectors.toList());
 
 
         for (User customer : users) {
